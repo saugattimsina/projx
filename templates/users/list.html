@@ -1,0 +1,68 @@
+{% extends 'base.html' %} {% block content %}
+<div class="d-flex py-3 align-items-center justify-content-between">
+  <div>
+    <h4>Users</h4>
+  </div>
+  <div>
+    {% if perms.users.add_user %}
+    <a href="{% url 'users:user_create' %}" class="btn btn-info btn-md">Add New User<i
+        class="mdi mdi-account-plus pl-2"></i></a>
+    {%endif%}
+  </div>
+</div>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead class="bg-secondary text-white">
+      <tr>
+        <th scope="col">S.N.</th>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Group</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in obj %}
+      <tr>
+        <td>{{user.id}}</td>
+        <td>{{user.username}}</td>
+        <td>{{user.email}} {{ user.user_uuid }}</td>
+        <td>{% for group in user.groups.all %} {{group}} {% endfor %}</td>
+        <td class="d-flex" style="float: right;">
+          {% if perms.users.change_user %}
+          <a href="{% url 'users:detail' user.username %}" class="btn btn-info btn-sm" style=" margin-right: 5px; "> view <i class="icon icon-eye">
+          </i></a>
+          <!-- <a href="{% url 'users:edituser' user.id %}" class="btn btn-primary btn-sm" style=" margin-right: 5px; "><i class="icon icon-pencil">
+              </i></a> -->
+    
+          {%endif%}
+          {%if user.username == "superadmin" or user.username == "admin"%}
+          {%else%}
+            {% if perms.users.delete_user %}
+            <form class="form-inline" method="post" action="{% url 'users:deleteuser' user.id %}">
+              {% csrf_token %}
+              <input type="submit" id="delete_user" class="btn btn-danger btn-sm" value="Delete" />
+              <!-- <a href="#" class="btn btn-danger btn-sm">delete</a> -->
+            </form>
+            {%endif%}
+          {%endif%}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include 'pages/pagination.html' %} {% endblock %} {% block js %}
+<script>
+  $(document).ready(function () {
+    $("#delete_user").click(function (e) {
+      e.preventDefault();
+      var form = $(this).parent();
+      var confirmation = confirm("Are you sure you want to delete this user?");
+      if (confirmation) {
+        form.submit();
+      }
+    });
+  });
+</script>
+{% endblock %}

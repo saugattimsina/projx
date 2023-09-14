@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}User: {{ object.username }}{% endblock %}
+
+{% block content %}
+<div class="page-content">
+<div class="page-breadcrumb">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Profile</h4>
+        </div>
+        <div class="col-7 align-self-center">
+            <div class="d-flex align-items-center justify-content-end">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="#">Home</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <!-- ============================================================== -->
+    <!-- Start Page Content -->
+    <!-- ============================================================== -->
+    <!-- Row -->
+    <div class="row">
+        <!-- Column -->
+        <div class="col-lg-4 col-xlg-3 col-md-5">
+            <div class="card">
+                <div class="card-body">
+                    {% if user.image %}
+                    <center class="m-t-30"> <img src="{{ user.image.url }}" class="rounded-circle" width="150" />
+                        <h4 class="card-title m-t-10">{{user.username}}</h4>
+                        <h6 class="card-subtitle">{{user.first_name}} {{user.last_name}}</h6>
+                        <div class="row text-center justify-content-md-center">
+                            <div class="col-8"><a href="{% url 'users:change_user_pwd' user.id %}" class="link"><i class="icon-pencil"></i> <font class="font-medium">Change Password</font></a></div>
+                            <!-- <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-picture"></i> <font class="font-medium">54</font></a></div> -->
+                        </div>
+                    </center>
+                    {%else%}
+                    <center class="m-t-30"> <img src="{% static 'images/users/profile.png' %}" class="rounded-circle" width="150" />
+                        <h4 class="card-title m-t-10">{{user.username}}</h4>
+                        <h6 class="card-subtitle">{{user.first_name}} {{user.last_name}}</h6>
+                        <div class="row text-center justify-content-md-center">
+                            <div class="col-8"><a href="{% url 'users:change_user_pwd' user.id %}" class="link"><i class="icon-pencil"></i> <font class="font-medium">Change Password</font></a></div>
+                            <!-- <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-people"></i> <font class="font-medium">254</font></a></div>
+                            <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-picture"></i> <font class="font-medium">54</font></a></div> -->
+                        </div>
+                    </center>
+                    {%endif%}
+                </div>
+                <div>
+                    <hr> </div>
+                <div class="card-body"> 
+                    <small class="text-muted">Email address </small>
+                    <h6>{{user.email}}</h6> 
+                    <small class="text-muted p-t-30 db">Phone</small>
+                    {% if user.cell_number_1 %}
+                        <h6>{{user.cell_number_1}}
+                    {%endif%}
+                    {% if user.cell_number_2 %}
+                        ,{{user.cell_number_2}}
+                    {%endif%}
+                    {% if user.home_number %}
+                        ,{{user.home_number}}
+                    {%endif%}
+                    <h6>{{user.contact_number}}</h6> 
+                    <small class="text-muted p-t-30 db">Address</small>
+                    <h6>{{user.address}}</h6>
+                    <!-- <div class="map-box">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d470029.1604841957!2d72.29955005258641!3d23.019996818380896!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e848aba5bd449%3A0x4fcedd11614f6516!2sAhmedabad%2C+Gujarat!5e0!3m2!1sen!2sin!4v1493204785508" width="100%" height="150" frameborder="0" style="border:0" allowfullscreen></iframe>
+                    </div> <small class="text-muted p-t-30 db">Social Profile</small>
+                    <br/>
+                    <button class="btn btn-circle btn-secondary"><i class="fab fa-facebook-f"></i></button>
+                    <button class="btn btn-circle btn-secondary"><i class="fab fa-twitter"></i></button>
+                    <button class="btn btn-circle btn-secondary"><i class="fab fa-youtube"></i></button> -->
+                </div>
+            </div>
+        </div>
+        <!-- Column -->
+        <!-- Column -->
+        <div class="col-lg-8 col-xlg-9 col-md-7">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+
+                        <!-- <h4 class="card-title">Default Tabs</h4>
+                        <p class="card-title-desc">Takes the basic nav from above and adds the <code class="highlighter-rouge">.nav-tabs</code> class to generate a tabbed interface.</p> -->
+
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#home" role="tab">
+                                    <i class="dripicons-home me-1 align-middle"></i> <span class="d-none d-md-inline-block">Account Information</span> 
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#profile" role="tab">
+                                    <i class="dripicons-user me-1 align-middle"></i> <span class="d-none d-md-inline-block">Profile</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#messages" role="tab">
+                                    <i class="dripicons-mail me-1 align-middle"></i> <span class="d-none d-md-inline-block">Messages</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#settings" role="tab">
+                                    <i class="dripicons-gear me-1 align-middle"></i> <span class="d-none d-md-inline-block">Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <!-- Tab panes -->
+                        <div class="tab-content p-3">
+                            <div class="tab-pane active" id="home" role="tabpanel">
+                                <p class="mb-0">
+                                    <!-- <div class="card">
+                                        <div class="card-body"> -->
+            
+                                            <!-- <h4 class="card-title">Accordion example</h4>
+                                            <p class="card-title-desc">Extend the default collapse behavior to create an accordion.</p> -->
+            
+                                            <div id="accordion">
+                                                <div class="card mb-0">
+                                                    <div class="card-header" id="headingOne">
+                                                        <h5 class="m-0 font-size-14">
+                                                            <a data-bs-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="text-dark">
+                                                                Binance-Spot-0B29
+                                                            </a>
+                                                            <a href="{% url 'users:edituser' user.id %}" class="btn btn-primary btn-sm" style=" margin-right: 5px; float: right;"><i class="fas fa-edit">
+                                                            </i></a>
+                                                        </h5>
+                                                    </div>
+            
+                                                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                                                        <div class="card-body">
+                                                            <!-- <h4 class="card-title">Grid options</h4>
+                                                            <p class="card-title-desc">See how aspects of the Bootstrap grid
+                                                                system work across multiple devices with a handy table.</p> -->
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-bordered table-striped table-nowrap mb-0">
+                                                                        <tbody>
+                                                                        <tr>
+                                                                            <th class="text-nowrap" scope="row">Name</th>
+                                                                            <td>Binance-Spot-0B29</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th class="text-nowrap" scope="row">Exchange</th>
+                                                                            <td>Binance</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th class="text-nowrap" scope="row">API Key</th>
+                                                                            <td><code>*******************1dAq1</code></td>
+                                                                            
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th class="text-nowrap" scope="row">Status</th>
+                                                                            <td colspan="6" style=" color: green; ">
+                                                                                <i class="fas fa-burn"></i><a> Active</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card mb-0">
+                                                    <div class="card-header" id="headingTwo">
+                                                        <h5 class="m-0 font-size-14">
+                                                            <a class="collapsed text-dark" data-bs-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                                Houbi-Coin-Futures-0H29
+                                                            </a>
+                                                            <a href="{% url 'users:edituser' user.id %}" class="btn btn-primary btn-sm" style=" margin-right: 5px; float: right;"><i class="fas fa-edit"></i>
+                                                        </h5>
+                                                    </div>
+                                                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                                        <div class="card-body">
+                                                            <div class="table-responsive">
+                                                                <table class="table table-bordered table-striped table-nowrap mb-0">
+                                                                    <tbody>
+                                                                    <tr>
+                                                                        <th class="text-nowrap" scope="row">Name</th>
+                                                                        <td>Houbi-Coin-Futures-0H29</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th class="text-nowrap" scope="row">Exchange</th>
+                                                                        <td>Houbi</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th class="text-nowrap" scope="row">API Key</th>
+                                                                        <td><code>*******************1dAq1</code></td>
+                                                                        
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th class="text-nowrap" scope="row">Status</th>
+                                                                        <td colspan="6" style=" color: green; ">
+                                                                            <i class="fas fa-burn"></i><a> Active</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card mb-0">
+                                                    <div class="card-header" id="headingThree">
+                                                        <h5 class="m-0 font-size-14">
+                                                            <a class="collapsed text-dark" data-bs-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                                Binance-Futures-0B29
+                                                            </a>
+                                                        </h5>
+                                                    </div>
+                                                    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                                                        <div class="card-body">
+                                                            <div class="table-responsive">
+                                                                <table class="table table-bordered table-striped table-nowrap mb-0">
+                                                                    <tbody>
+                                                                    <tr>
+                                                                        <th class="text-nowrap" scope="row">Name</th>
+                                                                        <td>Binance-Futures-0B29</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th class="text-nowrap" scope="row">Exchange</th>
+                                                                        <td>Binance</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th class="text-nowrap" scope="row">API Key</th>
+                                                                        <td><code>*******************1dAq1</code></td>
+                                                                        
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th class="text-nowrap" scope="row">Status</th>
+                                                                        <td colspan="6" style=" color: green; ">
+                                                                            <i class="fas fa-burn"></i><a> Active</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+            
+                                        <!-- </div>
+                                    </div> -->
+                                </p>
+                            </div>
+                            <div class="tab-pane" id="profile" role="tabpanel">
+                                <p class="mb-0">
+                                    Food truck fixie locavore, accusamus mcsweeney's marfa nulla
+                                    single-origin coffee squid. Exercitation +1 labore velit, blog
+                                    sartorial PBR leggings next level wes anderson artisan four loko
+                                    farm-to-table craft beer twee. Qui photo booth letterpress,
+                                    commodo enim craft beer mlkshk aliquip jean shorts ullamco ad
+                                    vinyl cillum PBR. Homo nostrud organic, assumenda labore
+                                    aesthetic magna delectus mollit.
+                                </p>
+                            </div>
+                            <div class="tab-pane" id="messages" role="tabpanel">
+                                <p class="mb-0">
+                                    Etsy mixtape wayfarers, ethical wes anderson tofu before they
+                                    sold out mcsweeney's organic lomo retro fanny pack lo-fi
+                                    farm-to-table readymade. Messenger bag gentrify pitchfork
+                                    tattooed craft beer, iphone skateboard locavore carles etsy
+                                    salvia banksy hoodie helvetica. DIY synth PBR banksy irony.
+                                    Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh
+                                    mi whatever gluten-free.
+                                </p>
+                            </div>
+                            <div class="tab-pane" id="settings" role="tabpanel">
+                                <p class="mb-0">
+                                    Trust fund seitan letterpress, keytar raw denim keffiyeh etsy
+                                    art party before they sold out master cleanse gluten-free squid
+                                    scenester freegan cosby sweater. Fanny pack portland seitan DIY,
+                                    art party locavore wolf cliche high life echo park Austin. Cred
+                                    vinyl keffiyeh DIY salvia PBR, banh mi before they sold out
+                                    farm-to-table VHS viral locavore cosby sweater. Lomo wolf viral,
+                                    mustache.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Column -->
+    </div>
+    <!-- Row -->
+    <!-- ============================================================== -->
+    <!-- End PAge Content -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- Right sidebar -->
+    <!-- ============================================================== -->
+    <!-- .right-sidebar -->
+    <!-- ============================================================== -->
+    <!-- End Right sidebar -->
+    <!-- ============================================================== -->
+</div>
+</div>
+{% endblock content %}

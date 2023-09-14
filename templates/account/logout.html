@@ -1,0 +1,47 @@
+{% extends "account/base.html" %}
+{% load static %}
+{% load i18n %}
+{% block title%}
+    Logout | Xonic
+{%endblock%}
+{% block head_title %}
+  {% translate "Sign Out" %}
+{% endblock head_title %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-xl-4 col-lg-6 col-md-8">
+      <div class="card">
+          <div class="card-body p-4">
+              <div class="">
+                  <div class="text-center">
+                      <a href="index.html" class="">
+                          <img src="{% static 'assets/images/logo-dark.png' %}" alt="" height="24" class="auth-logo logo-dark mx-auto">
+                          <img src="{% static 'assets/images/logo-light.png' %}" alt="" height="24" class="auth-logo logo-light mx-auto">
+                      </a>
+                  </div>
+                  <!-- end row -->
+                  <h4 class="font-size-18 text-muted mt-2 text-center">{% translate "Sign Out" %}</h4>
+                  <p class="mb-5 text-center">{% translate "Are you sure you want to sign out?" %}</p>
+                  <!-- CUSTOM CONTENT START -->
+                  <!-- <h1>{% translate "Sign Out" %}</h1> -->
+                  <!-- <p>{% translate "Are you sure you want to sign out?" %}</p> -->
+                  <form method="post" action="{% url 'account_logout' %}" style="text-align: center;">
+                    {% csrf_token %}
+                    {% if redirect_field_value %}
+                      <input type="hidden"
+                            name="{{ redirect_field_name }}"
+                            value="{{ redirect_field_value }}" />
+                    {% endif %}
+                    <button class="btn btn-primary waves-effect waves-light" type="submit">{% translate "Sign Out" %}</button>
+                  </form>
+                  <!-- CUSTOM CONTENT END -->
+              </div>
+          </div>
+      </div>
+      <div class="mt-5 text-center">
+          <p class="text-white-50">© <script>document.write(new Date().getFullYear())</script> <a href="#">232</a></p>
+      </div>
+  </div>
+</div>
+  
+{% endblock content %}

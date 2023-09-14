@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-content">
+    <div class="container-fluid">
+<!-- NEED TO DELETE THIS SAMPLE START  -->
+<!-- <div class="row">
+    <form action = "" method = "post">
+        {% csrf_token %}
+        {{form.as_p }}
+        <input type="submit" value="Submit">
+    </form>
+</div> -->
+<!-- NEED TO DELETE THIS SAMPLE END -->
+        <!-- start page title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                    <h4 class="mb-sm-0">User Create</h4>
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">Forms</a></li>
+                            <li class="breadcrumb-item active">Form Mask</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end page title -->
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Example</h4>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div>
+                                        <div class="mb-4">
+                                            <label for="input-date1">{{form.first_name.label}}</label>
+                                            <!-- <input id="input-date1" class="form-control input-mask" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy" inputmode="numeric"> -->
+                                            <input class="form-control" id="id_first_name" maxlength="150" name="first_name" type="text">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="input-date2">{{form.username.label}}</label>
+                                            <!-- <input id="input-date2" class="form-control input-mask" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="mm/dd/yyyy" inputmode="numeric"> -->
+                                            <input class="form-control" id="id_username" maxlength="150" name="username" required="" type="text">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="input-datetime">{{form.email.label}}</label>
+                                            <!-- <input id="input-datetime" class="form-control input-mask" data-inputmask="'alias': 'datetime'" inputmode="numeric"> -->
+                                            <input class="form-control" id="id_email" maxlength="254" name="email" type="email">
+                                        </div>
+                                        <div class="mb-0">
+                                            <label for="input-currency">{{form.cell_number_1.label}}</label>
+                                            <!-- <input id="input-currency" class="form-control input-mask text-left" data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'prefix': '$ ', 'placeholder': '0'" inputmode="decimal" style="text-align: right;"> -->
+                                            <input class="form-control" id="id_cell_number_1" maxlength="13" name="cell_number_1" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="mt-4 mt-lg-0">
+                                        <div class="mb-4">
+                                            <label for="input-repeat">{{form.last_name.label}}</label>
+                                            <!-- <input id="input-repeat" class="form-control input-mask" data-inputmask="'mask': '9', 'repeat': 10, 'greedy' : false" inputmode="text"> -->
+                                            <input class="form-control" id="id_last_name" maxlength="150" name="last_name" type="text">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="input-mask">{{form.password.label}}</label>
+                                            <!-- <input id="input-mask" class="form-control input-mask" data-inputmask="'mask': '99-9999999'" inputmode="text"> -->
+                                            <input class="form-control" id="id_password" maxlength="128" name="password" required="" type="password">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="input-ip">{{form.home_number.label}}</label>
+                                            <!-- <input id="input-ip" class="form-control input-mask" data-inputmask="'alias': 'ip'" inputmode="numeric"> -->
+                                            <input class="form-control" id="id_home_number" maxlength="13" name="home_number" type="text">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="input-email">{{form.cell_number_2.label}}</label>
+                                            <!-- <input id="input-email" class="form-control input-mask" data-inputmask="'alias': 'email'" inputmode="email"> -->
+                                            <input class="form-control" id="id_cell_number_2" maxlength="13" name="cell_number_2" type="text">
+                                        </div>
+                                    </div>                                    
+                                </div>
+                                <div class="row">
+                                    <div class="mb-4">
+                                        <label for="input-email">{{form.address.label}}</label>
+                                        <!-- <input id="input-email" class="form-control input-mask" data-inputmask="'alias': 'email'" inputmode="email"> -->
+                                        <input class="form-control" id="{{form.address.id_for_label}}" maxlength="13" name="{{form.address.name}}" type="text">
+                                    </div>
+                                </div>
+                                <!-- RADIO -->
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div>
+                                                <h5 class="font-size-14 mb-3">Select User Type </h5>
+                                                <div class="form-check mb-2">
+                                                    {% if form.is_staff.value %}
+                                                        <input checked class="form-check-input" type="checkbox" id="{{form.is_staff.id_for_label}}" name="{{form.is_staff.name}}">
+                                                    {%else%}
+                                                        <input class="form-check-input" type="checkbox" id="{{form.is_staff.id_for_label}}" name="{{form.is_staff.name}}">
+                                                    {%endif%}
+                                                    <label class="form-check-label" for="{{form.is_staff.id_for_label}}">
+                                                        {{form.is_staff.label}}
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-2">
+                                                    {% if form.is_agent.value %}
+                                                        <input checked class="form-check-input" type="checkbox" value="" id="{{form.is_agent.id_for_label}}">
+                                                    {%else%}
+                                                        <input class="form-check-input" type="checkbox" id="{{form.is_agent.id_for_label}}" name="{{form.is_agent.name}}">
+                                                    {%endif%}
+                                                    <label class="form-check-label" for="{{form.is_agent.id_for_label}}">
+                                                        {{form.is_agent.label}}
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    {% if form.is_client.value %}
+                                                        <input checked class="form-check-input" type="checkbox" value="" id="{{form.is_agent.id_for_label}}">
+                                                    {%else%}
+                                                        <input class="form-check-input" type="checkbox" id="{{form.is_client.id_for_label}}" name="{{form.is_client.name}}">
+                                                    {%endif%}
+                                                    <label class="form-check-label" for="id_is_client">
+                                                        {{form.is_client.label}}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="mt-4 mt-lg-0">
+                                                <h5 class="font-size-14 mb-3">User Status</h5>
+                                                <div class="form-check mb-2">
+                                                    {% if form.is_active.value == 1 %}
+                                                        <input checked type="radio" id="{{form.is_active.id_for_label}}" name="{{form.is_active.name}}" class="form-check-input" >
+                                                        <label class="form-check-label" for="{{form.is_active.id_for_label}}">Active</label>
+                                                    {%else%}
+                                                        <input type="radio" id="{{form.is_active.id_for_label}}" name="{{form.is_active.name}}" class="form-check-input">
+                                                        <label class="form-check-label" for="{{form.is_active.id_for_label}}">Active</label>
+                                                    {%endif%}
+                                                    <!-- <label class="form-check-label" for="customRadio1">Active</label> -->
+                                                </div>
+                                                <div class="form-check">
+                                                    {% if form.is_active.value == 0 %}
+                                                        <input checked type="radio" id="{{form.is_active.id_for_label}}" name="{{form.is_active.name}}" class="form-check-input" >
+                                                        <label class="form-check-label" for="{{form.is_active.id_for_label}}">Inactive</label>
+                                                    {%else%}
+                                                        <input type="radio" id="{{form.is_active.id_for_label}}" name="{{form.is_active.name}}" class="form-check-input">
+                                                        <label class="form-check-label" for="{{form.is_active.id_for_label}}">Inactive</label>
+                                                    {%endif%}
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right" style="text-align: end;">
+                                <input class="btn btn-primary" type="submit" value="Submit">
+                            </div>
+                            
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end row -->
+
+    </div> <!-- container-fluid -->
+</div>
+{% endblock %}

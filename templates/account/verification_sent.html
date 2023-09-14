@@ -1,0 +1,33 @@
+{% extends "account/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title%}
+  {% translate "Verify Your E-mail Address" %}
+{% endblock title %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-xl-4 col-lg-6 col-md-8">
+      <div class="card">
+          <div class="card-body p-4">
+              <div class="">
+                  <div class="text-center">
+                      <a href="index.html" class="">
+                          <img src="{% static 'assets/images/logo-dark.png' %}" alt="" height="24" class="auth-logo logo-dark mx-auto">
+                          <img src="{% static 'assets/images/logo-light.png' %}" alt="" height="24" class="auth-logo logo-light mx-auto">
+                      </a>
+                  </div>
+                  <!-- end row -->
+                  <h4 class="font-size-18 text-muted mt-2 text-center">{% translate "Verify Your E-mail Address" %}</h4>
+                  <div class="mb-5"></div>
+                  <p class="mb-5 text-center">{% blocktranslate %}We have sent an e-mail to you for verification. Follow the link provided to finalize the signup process. Please contact us if you do not receive it within a few minutes.{% endblocktranslate %}</p>
+              </div>
+          </div>
+      </div>
+      <div class="mt-5 text-center">
+          <p class="text-white-50">© <script>document.write(new Date().getFullYear())</script> <a href="#">232</a></p>
+      </div>
+  </div>
+</div>
+  
+{% endblock content %}

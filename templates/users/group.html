@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+
+
+<form action="{% url 'users:group' %}" method="POST" style="margin-top:5rem;">
+{% csrf_token %}
+    {{ form.as_p }}
+<input type="submit" class="btn btn-primary btn-sm" value="Submit">
+</form>
+
+
+{% endblock %}
+
+{% block js %}
+<script>
+
+$(document).ready(function() {
+   $(".select2-selection").css("height", "100%");
+});
+</script>
+
+
+{%endblock %}

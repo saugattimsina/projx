@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div class="page-content">
+    <div class="container-fluid">
+
+        <!-- start page title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                    <h4 class="mb-sm-0">List Of Users</h4>
+
+                    <div class="page-title-right">
+                        <!-- <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">Tables</a></li>
+                            <li class="breadcrumb-item active">Data Tables</li>
+                        </ol> -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- end page title -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- <h4 class="card-title">Basic example</h4> -->
+                        <!-- <p class="card-title-desc">For basic styling—light padding and
+                                only horizontal dividers—add the base class <code>.table</code> to any
+                                <code>&lt;table&gt;</code>.
+                        </p>     -->
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Username</th>
+                                        <th>Address</th>
+                                        <th>Email</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for x in obj %}
+                                    <tr>
+                                        <th scope="row">{{ forloop.counter }}</th>
+                                        <td>{{x.first_name}}</td>
+                                        <td>{{x.last_name}}</td>
+                                        <td>{{x.username}}</td>
+                                        <td>{{x.address}}</td>
+                                        <td>{{x.email}}</td>
+                                        {% if x.is_active%}
+                                            <td colspan="6" style=" color: green; ">
+                                                <i class="fas fa-burn"></i><a> Active</a>
+                                            </td>
+                                        {%else%}
+                                        <td colspan="6" style=" color: red; ">
+                                            <i class="fas fa-burn"></i><a> Inctive</a>
+                                        </td>
+                                        {%endif%}
+                                        <td class="d-flex">
+                                            {% if perms.users.change_user %}
+                                            <a href="{% url 'users:detail' x.username %}" class="btn btn-info btn-sm" style=" margin-right: 5px; "><i class="far fa-eye">
+                                            </i></a>
+                                            <a href="{% url 'users:edituser' x.id %}" class="btn btn-primary btn-sm" style=" margin-right: 5px; "><i class="fas fa-edit">
+                                                </i></a>
+                                            <a href="{% url 'users:change_user_pwd' x.id %}" class="btn btn-info btn-sm" style=" margin-right: 5px; "><i class="fas fa-user-cog">
+                                                </i></a>
+                                            {%endif%}
+                                            {%if user.username == "superadmin" or user.username == "admin"%}
+                                            {%else%}
+                                              {% if perms.users.delete_user %}
+                                              <form class="form-inline" method="post" action="{% url 'users:deleteuser' user.id %}">
+                                                {% csrf_token %}
+                                                <input type="submit" id="delete_user" class="btn btn-danger btn-sm" value="Delete" />
+                                                <!-- <a href="#" class="btn btn-danger btn-sm">delete</a> -->
+                                              </form>
+                                              {%endif%}
+                                            {%endif%}
+                                          </td>                                   
+                                    </tr>
+                                    {% endfor %}
+                                    <!-- <tr>
+                                        <th scope="row">2</th>
+                                        <td>Jacob</td>
+                                        <td>Thornton</td>
+                                        <td>@fat</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">3</th>
+                                        <td>Larry</td>
+                                        <td>the Bird</td>
+                                        <td>@twitter</td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div> <!-- end col -->
+        </div> <!-- end row -->
+    </div> <!-- container-fluid -->
+</div>
+
+{% endblock %}
