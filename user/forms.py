@@ -7,8 +7,12 @@ from django import forms
 from django.contrib.auth.models import Group
 
 # User = get_user_model()
-from .models import User
+from .models import User,UserKey
 
+class UserKeyForm(forms.ModelForm):
+    class Meta:
+        model = UserKey
+        fields = '__all__'
 
 class UserCreationForm(forms.ModelForm):
     # confirm_password=forms.CharField(widget=forms.PasswordInput())

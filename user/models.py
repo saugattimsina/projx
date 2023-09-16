@@ -32,3 +32,10 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"username": self.username})
+
+
+class UserKey(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    api_key = models.CharField(max_length=255)
+    api_secret = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)

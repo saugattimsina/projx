@@ -13,13 +13,15 @@ from .views import (
     UserEditView,
     UserCreateView,
     UserDeleteView,
-    change_password_view
+    change_password_view,
+    CreateKeyView,
 )
 
 app_name = "users"
 urlpatterns = [
     path("~redirect/", view=user_redirect_view, name="redirect"),
     path("~update/", view=user_update_view, name="update"),
+    path("createkey/", view=CreateKeyView.as_view(), name="createkey"),
     path("group",GroupView.as_view(),name="group"),
     path("group-list",GroupList.as_view(),name="group-list"),
     path("list",ListUsersView.as_view(),name="user_list"),

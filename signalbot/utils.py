@@ -2,15 +2,13 @@ import requests
 
 from django.conf import settings
 from celery import shared_task
-from user.models import User
-
+from user.models import User,UserKey
+from .models import TradeSignals
 
 import uuid
 
-BINANCETN_API_KEY = "568fbe6822165f8feb172cd10ce0e1c39bd61f1102fab71d95fb9860eb94b226"
-BINANCETN_API_SECRET = "cc8c83dd0013595db27a932f5eeda3f677beb5cd1e3c351b1e9b4b3c21a6364f"
 
-
+from .trade_set import create_my_trade
 
 def is_valid_uuid(val):
     try:
@@ -25,6 +23,7 @@ def commands_handlers(message_text,user_telegram):
         reply = f"you typed {message_text}"
         if message_text.startswith("/start"):
             uuid = message_text.split(' ')[-1]
+            print("uuid is ",uuid)
             if is_valid_uuid(uuid):
                 user = User.objects.filter(user_uuid=uuid,telegram_id=user_telegram).first()
                 if user:
@@ -39,7 +38,7 @@ def commands_handlers(message_text,user_telegram):
                     else:
                         reply = f"invalid key please recheck \n use /start <your_token> to setup your account" 
             else:
-                reply = f"invalid key please recheck \n use /start <your_token> to setup your account"
+                reply = f"invalid key (non uuid) please recheck \n use /start <your_token> to setup your account"
                 
     
     else:
@@ -75,8 +74,15 @@ def process_telegram_message(message):
                 reply,chat_id,user_telegram = new_message(my_message)
                 click_data = my_message["data"]
                 print(reply,chat_id,user_telegram)
-
+                signal= TradeSignals.objects.get(id=click_data)
+                user = User.objects.filter(telegram_id=chat_id).first()
+                print(user)
+                userkey = UserKey.objects.filter(user=user).first()
+                print(userkey)
+                trade_data = create_my_trade(signal,user,userkey)
+                print(signal)
                 print("the data is",click_data)
-        # data = {"chat_id": chat_id, "text": reply}
+                reply = f"your trade has been placed we will let you know once it is executed"
+        data = {"chat_id": chat_id, "text": reply}
 
-        # requests.post(reply_url, data=data)
+        requests.post(reply_url, data=data)

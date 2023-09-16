@@ -9,12 +9,12 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, RedirectView, UpdateView,CreateView,ListView,DeleteView
 from django.views.generic.edit import FormMixin
 
-from .forms import UserGroup,UserCreationForm,UserEditForm
+from .forms import UserGroup,UserCreationForm,UserEditForm,UserKeyForm
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.forms import PasswordChangeForm
 # from view_breadcrumbs import CreateBreadcrumbMixin,ListBreadcrumbMixin
-
+from .models import UserKey
 User = get_user_model()
 
 
@@ -217,3 +217,12 @@ def change_user_password(request,id):
             return render(request,'users/password_change_user.html',context={'form':form,'id':user_obj.id})
         except Exception as exc:
             return render(request,'users/password_change_user.html',context={'form':form,'id':user_obj.id})
+        
+
+
+
+class CreateKeyView(CreateView):
+    model = UserKey
+    form_class = UserKeyForm
+    template_name = "users/create_key.html"
+    success_url = "/" 
