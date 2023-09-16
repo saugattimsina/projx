@@ -23,7 +23,7 @@ class User(AbstractUser):
     is_staff = BooleanField(default=False)
     # is_agent = BooleanField(default=False)
     is_client = BooleanField(default=False)
-    telegram_id = models.IntegerField(blank=True)
+    telegram_id = models.IntegerField(null=True,blank=True)
     def get_absolute_url(self):
         """Get url for user's detail view.
 
