@@ -34,7 +34,9 @@ class UserDetailView(LoginRequiredMixin, FormMixin,DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(UserDetailView, self).get_context_data(**kwargs)
+        wallet = UserKey.objects.filter(user=self.object).first()
         context['form'] = UserEditForm(instance=self.object)
+        context['wallet'] = wallet
         return context
 
 user_detail_view = UserDetailView.as_view()
@@ -76,7 +78,7 @@ class GroupView(LoginRequiredMixin,PermissionRequiredMixin,CreateView):
     form_class= UserGroup
     template_name="users/group.html"
     # context_obj_name="form"
-    success_url = reverse_lazy('users:list')
+    success_url = reverse_lazy('users:group-list')
     success_message = "%(name)s was created successfully!"
 
 

@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
-from django_telethon.urls import django_telethon_urls
+# from django_telethon.urls import django_telethon_urls
 
 admin.autodiscover()
 
@@ -30,7 +30,7 @@ urlpatterns = [
     path("",include('user.urls')),
     path("",include('accounts.urls')),
     path("trade/",include('signalbot.urls')),
-    path('telegram/', django_telethon_urls()),
+    # path('telegram/', django_telethon_urls()),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
@@ -57,6 +57,6 @@ if settings.DEBUG:
     ]
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
-
+        print("debug toolbar is installed")
         urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
 

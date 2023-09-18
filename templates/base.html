@@ -202,6 +202,27 @@
                                     <li><a href="{% url 'users:user_create' %}">Create User</a></li>
                                 </ul>
                             </li>
+
+                            <li>
+                                <a href="#" class="has-arrow waves-effect">
+                                    <i class="mdi mdi-account-cog"></i>
+                                    <span>Permission</span>
+                                </a>
+                                <ul class="sub-menu">
+                                    <li><a href="{% url 'users:group' %}">group</a></li>
+                                    <li><a href="{% url 'users:group-list' %}">group list</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#" class="has-arrow waves-effect">
+                                    <i class="mdi mdi-account-cog"></i>
+                                    <span>Signals</span>
+                                </a>
+                                <ul class="sub-menu">
+                                    <li><a href="{% url 'signalbot:create-trade' %}"> Create Signal </a></li>
+                                    <li><a href="{% url 'signalbot:signal-history' %}">Signal History</a></li>
+                                </ul>
+                            </li>
                             <li>
                                 <a href="#" class="has-arrow waves-effect">
                                     <i class="mdi mdi-cards-playing-outline"></i>
@@ -267,7 +288,11 @@
 
     <script src="{% static 'assets/js/pages/dashboard.init.js' %} "></script>
 
-    {% block javascript %}{% endblock javascript %}
+    {% block javascript %}
+    
+    
+    
+    {% endblock javascript %}
 </body>
 
 </html>

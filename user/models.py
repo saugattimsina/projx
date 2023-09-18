@@ -39,3 +39,6 @@ class UserKey(models.Model):
     api_key = models.CharField(max_length=255)
     api_secret = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.api_key[0:5]+'****************'

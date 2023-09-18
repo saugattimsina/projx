@@ -1,8 +1,11 @@
-    hello
-<form method="post">
-{% csrf_token %}
-    {{ form }}
-
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<form method="post" style="padding-top: 5rem; padding-left:4rem;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
     <input type="submit" value="Create" />
 </form>
 
+{% endblock content %}

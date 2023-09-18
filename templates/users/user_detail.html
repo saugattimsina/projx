@@ -132,7 +132,7 @@
                                                     <div class="card-header" id="headingOne">
                                                         <h5 class="m-0 font-size-14">
                                                             <a data-bs-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="text-dark">
-                                                                Binance-Spot-0B29
+                                                                Binance-Future
                                                             </a>
                                                             <a href="{% url 'users:edituser' user.id %}" class="btn btn-primary btn-sm" style=" margin-right: 5px; float: right;"><i class="fas fa-edit">
                                                             </i></a>
@@ -149,7 +149,7 @@
                                                                         <tbody>
                                                                         <tr>
                                                                             <th class="text-nowrap" scope="row">Name</th>
-                                                                            <td>Binance-Spot-0B29</td>
+                                                                            <td>Binance-Future</td>
                                                                         </tr>
                                                                         <tr>
                                                                             <th class="text-nowrap" scope="row">Exchange</th>
@@ -157,7 +157,7 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <th class="text-nowrap" scope="row">API Key</th>
-                                                                            <td><code>*******************1dAq1</code></td>
+                                                                            <td><code>{{ wallet }}</code></td>
                                                                             
                                                                         </tr>
                                                                         <tr>
@@ -172,83 +172,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="card mb-0">
-                                                    <div class="card-header" id="headingTwo">
-                                                        <h5 class="m-0 font-size-14">
-                                                            <a class="collapsed text-dark" data-bs-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                                                Houbi-Coin-Futures-0H29
-                                                            </a>
-                                                            <a href="{% url 'users:edituser' user.id %}" class="btn btn-primary btn-sm" style=" margin-right: 5px; float: right;"><i class="fas fa-edit"></i>
-                                                        </h5>
-                                                    </div>
-                                                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-                                                        <div class="card-body">
-                                                            <div class="table-responsive">
-                                                                <table class="table table-bordered table-striped table-nowrap mb-0">
-                                                                    <tbody>
-                                                                    <tr>
-                                                                        <th class="text-nowrap" scope="row">Name</th>
-                                                                        <td>Houbi-Coin-Futures-0H29</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="text-nowrap" scope="row">Exchange</th>
-                                                                        <td>Houbi</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="text-nowrap" scope="row">API Key</th>
-                                                                        <td><code>*******************1dAq1</code></td>
-                                                                        
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="text-nowrap" scope="row">Status</th>
-                                                                        <td colspan="6" style=" color: green; ">
-                                                                            <i class="fas fa-burn"></i><a> Active</a>
-                                                                        </td>
-                                                                    </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="card mb-0">
-                                                    <div class="card-header" id="headingThree">
-                                                        <h5 class="m-0 font-size-14">
-                                                            <a class="collapsed text-dark" data-bs-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                                                Binance-Futures-0B29
-                                                            </a>
-                                                        </h5>
-                                                    </div>
-                                                    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
-                                                        <div class="card-body">
-                                                            <div class="table-responsive">
-                                                                <table class="table table-bordered table-striped table-nowrap mb-0">
-                                                                    <tbody>
-                                                                    <tr>
-                                                                        <th class="text-nowrap" scope="row">Name</th>
-                                                                        <td>Binance-Futures-0B29</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="text-nowrap" scope="row">Exchange</th>
-                                                                        <td>Binance</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="text-nowrap" scope="row">API Key</th>
-                                                                        <td><code>*******************1dAq1</code></td>
-                                                                        
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th class="text-nowrap" scope="row">Status</th>
-                                                                        <td colspan="6" style=" color: green; ">
-                                                                            <i class="fas fa-burn"></i><a> Active</a>
-                                                                        </td>
-                                                                    </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                              
+                                                
                                             </div>
             
                                         <!-- </div>
@@ -257,13 +182,7 @@
                             </div>
                             <div class="tab-pane" id="profile" role="tabpanel">
                                 <p class="mb-0">
-                                    Food truck fixie locavore, accusamus mcsweeney's marfa nulla
-                                    single-origin coffee squid. Exercitation +1 labore velit, blog
-                                    sartorial PBR leggings next level wes anderson artisan four loko
-                                    farm-to-table craft beer twee. Qui photo booth letterpress,
-                                    commodo enim craft beer mlkshk aliquip jean shorts ullamco ad
-                                    vinyl cillum PBR. Homo nostrud organic, assumenda labore
-                                    aesthetic magna delectus mollit.
+                                   Telegram ID: {{ user.telegram_id }}
                                 </p>
                             </div>
                             <div class="tab-pane" id="messages" role="tabpanel">

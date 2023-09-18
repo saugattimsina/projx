@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<table class="table table-dark table-bodered" style="padding-top: 15rem; padding-left:5rem;margin-top:5rem;">
+<thead>
+    <tr>
+        <td>
+            User
+        </td>
+        <td>
+            Signal
+        </td>
+        <td>
+            followed on
+        </td>
+    </tr>
+</thead>
+<tbody>
+    {% for individual in followers  %}
+    <tr>
+       <td>
+        {{individual.user}}
+       </td>
+       <td>
+        <table>
+            <tr>
+                <th>
+                    Symbol
+                </th>
+                <th>
+                    Price
+                </th>
+                <th>
+                    Stop Amount
+                </th>
+                <th>
+                    Take Profit Amount
+                </th>
+            </tr>
+            <tr>
+                <td>
+
+                    {{individual.signal.symbol}} 
+                </td>
+                <td>
+                    {{individual.signal.price}}
+                </td>
+                <td>
+                    {{individual.signal.stop_amount}}
+                </td>
+                <td>
+                    {{individual.signal.take_profit_amount}}
+                </td>
+            </tr>
+        </table>
+
+       </td>
+       <td>
+        {{individual.created_on}}
+       </td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+</table>
+{% endblock content %}

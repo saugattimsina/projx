@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +46,7 @@ INSTALLED_APPS = [
     'user',
     'accounts',
     'signalbot',
-    'django_telethon',
+    # 'django_telethon',
     'rest_framework'
 ]
 if DEBUG:
@@ -88,14 +93,16 @@ WSGI_APPLICATION = 'projx.wsgi.application'
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.environ.get('DATABASE_ENGINE'),
+        'NAME': os.environ.get('DATABASE_NAME'),
+        'USER': os.environ.get('DATABASE_USER'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+        'HOST': os.environ.get('DATABASE_HOST'),
+        'PORT': os.environ.get('DATABASE_PORT'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -133,7 +140,7 @@ USE_TZ = True
 
 # STATIC_ROOT = os.path.join(BASE_DIR,'static')
 STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
@@ -149,7 +156,7 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
-TELEGRAM_API_TOKEN ='6167336537:AAGaviat4GGhS8gdTeoA6xHf9YRQ8-_-5QI'
+TELEGRAM_API_TOKEN ='6440602179:AAGMK8FDO2MtWjinFhejMTdQbdh9qHZ-2b4'
 TELEGRAM_WEBHOOK_TOKEN = "somerandomstring"
 
 CELERY_BROKER_URL = "redis://redis_server:6379/0"
