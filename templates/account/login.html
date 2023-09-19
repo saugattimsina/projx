@@ -17,14 +17,16 @@
                     </div>
                     <!-- end row -->
                     <h4 class="font-size-18 text-muted mt-2 text-center">Welcome Back !</h4>
-                    <p class="mb-5 text-center">Sign in to continue to Xonic.</p>
-                    <form class="form-horizontal m-t-20" id="loginform" method="POST" action="{% url 'account_login' %}?next=/dashboard/">
+                    <p class="mb-5 text-center">Sign in to continue to projx.</p>
+                    <p class="mb-5 text-center">{{ message }}</p>
+
+                    <form class="form-horizontal m-t-20" id="loginform" method="post" action="{% url 'users:login' %}?next=/dashboard/">
                         {% csrf_token %}
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-4">
-                                    <label class="form-label" for="{{form.login.auto_id}}">Username</label>
-                                    <input type="text" class="form-control" id="{{form.login.auto_id}}" name="{{form.login.html_name}}" placeholder="Enter username">
+                                    <label class="form-label" for="{{form.username.auto_id}}">Username</label>
+                                    <input type="text" class="form-control" id="{{form.username.auto_id}}" name="{{form.username.html_name}}" placeholder="Enter username">
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label" for="{{form.password.auto_id}}">Password</label>
@@ -39,14 +41,14 @@
                                     </div>
                                     <div class="col-7">
                                         <div class="text-md-end mt-3 mt-md-0">
-                                            <a href="{% url 'account_reset_password' %}" class="text-muted"><i class="mdi mdi-lock"></i> Forgot your password?</a>
+                                            <a href="" class="text-muted"><i class="mdi mdi-lock"></i> Forgot your password?</a>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="d-grid mt-4">
                                     <button class="btn btn-primary waves-effect waves-light" type="submit">Log In</button>
                                 </div>
-                                <div class="col" style="text-align: center;"><a href="{{ signup_url }}">sign up</a></div>
+                                
                             </div>
                         </div>
                     </form>

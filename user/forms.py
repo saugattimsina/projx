@@ -127,3 +127,9 @@ class UserGroup(forms.ModelForm):
             'name':forms.TextInput(attrs={'class':'form-control'}),
             'permissions':forms.SelectMultiple(attrs={"class": "select2 form-control","multiple":"","tabindex":"-1","aria-hidden":"true","style":"height: 36px;width: 100%;"}),
         }
+
+
+class LoginForm(forms.Form):
+    username = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control'}))
+    

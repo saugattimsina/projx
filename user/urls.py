@@ -15,6 +15,7 @@ from .views import (
     UserDeleteView,
     change_password_view,
     CreateKeyView,
+    UserLoginView,
 )
 
 app_name = "users"
@@ -32,5 +33,6 @@ urlpatterns = [
     path('deleteuser/<str:pk>/',view=UserDeleteView.as_view(),name="deleteuser"),
     path('change_password/',view= change_password_view,name='change_password'),
     path('change_user_password/<int:id>',change_user_password,name='change_user_pwd'),
+    path("login/",UserLoginView.as_view(),name="login"),
     path("<str:username>/", view=user_detail_view, name="detail"),
 ]

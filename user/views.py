@@ -6,13 +6,15 @@ from django.shortcuts import redirect, render
 
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, RedirectView, UpdateView,CreateView,ListView,DeleteView
+from django.views.generic import DetailView, RedirectView, UpdateView,CreateView,ListView,DeleteView,FormView
 from django.views.generic.edit import FormMixin
 
-from .forms import UserGroup,UserCreationForm,UserEditForm,UserKeyForm
+from .forms import UserGroup,UserCreationForm,UserEditForm,UserKeyForm,LoginForm
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import authenticate, login
+
 # from view_breadcrumbs import CreateBreadcrumbMixin,ListBreadcrumbMixin
 from .models import UserKey
 User = get_user_model()
@@ -73,7 +75,7 @@ user_redirect_view = UserRedirectView.as_view()
 
 
 class GroupView(LoginRequiredMixin,PermissionRequiredMixin,CreateView):
-    login_url = reverse_lazy('account_login')
+    login_url = reverse_lazy('users:login')
     permission_required = ('auth.add_group',)
     form_class= UserGroup
     template_name="users/group.html"
@@ -83,7 +85,7 @@ class GroupView(LoginRequiredMixin,PermissionRequiredMixin,CreateView):
 
 
 class GroupList(LoginRequiredMixin,PermissionRequiredMixin,ListView):
-    login_url = reverse_lazy('account_login')
+    login_url = reverse_lazy('users:login')
     permission_required = ('auth.view_group',)
     model = Group
     context_object_name='obj'
@@ -91,7 +93,7 @@ class GroupList(LoginRequiredMixin,PermissionRequiredMixin,ListView):
 
 
 class ListUsersView(LoginRequiredMixin,PermissionRequiredMixin,ListView):
-    login_url = reverse_lazy('account_login')
+    login_url = reverse_lazy('users:login')
     permission_required = ('users.view_user',)
     model = User
     ordering = "-id"
@@ -99,7 +101,7 @@ class ListUsersView(LoginRequiredMixin,PermissionRequiredMixin,ListView):
     template_name = "users/list.html"
 
 class GroupEditView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
-    login_url = reverse_lazy('account_login')
+    login_url = reverse_lazy('users:login')
     permission_required = ('auth.change_group',)
     model = Group
     form_class = UserGroup
@@ -110,7 +112,7 @@ class GroupEditView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
 
 
 class GroupDeleteView(LoginRequiredMixin,PermissionRequiredMixin,DeleteView):
-    login_url = reverse_lazy('account_login')
+    login_url = reverse_lazy('users:login')
     permission_required = ('auth.delete_group',)
     model = Group
     template_name = "users/delete_group.html"
@@ -120,7 +122,7 @@ class GroupDeleteView(LoginRequiredMixin,PermissionRequiredMixin,DeleteView):
 
 
 class UserCreateView(LoginRequiredMixin,PermissionRequiredMixin,CreateView):
-    login_url = reverse_lazy('account_login')
+    login_url = reverse_lazy('users:login')
     permission_required = ('users.add_user',)
     model = User
     form_class = UserCreationForm
@@ -156,7 +158,7 @@ class UserCreateView(LoginRequiredMixin,PermissionRequiredMixin,CreateView):
     #         return super().form_valid(form)
             
 class UserEditView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
-    login_url = reverse_lazy('account_login')
+    login_url = reverse_lazy('users:login')
     permission_required = ('users.change_user',)
     model = User
     form_class = UserEditForm
@@ -186,7 +188,7 @@ class UserEditView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
 
 
 class UserDeleteView(LoginRequiredMixin,PermissionRequiredMixin,DeleteView):
-    login_url = reverse_lazy('account_login')
+    login_url = reverse_lazy('users:login')
     permission_required = ('users.delete_user',)
     model = User
     template_name = "users/delete_user.html"
@@ -228,3 +230,28 @@ class CreateKeyView(CreateView):
     form_class = UserKeyForm
     template_name = "users/create_key.html"
     success_url = "/" 
+
+
+class UserLoginView(FormView):
+    form_class = LoginForm
+    template_name = "account/login.html"
+
+    def post(self, request):
+        form = self.form_class(request.POST)  # Initialize the form with POST data
+        if form.is_valid():
+
+            print(form.cleaned_data)  # This will print the cleaned form data
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+
+            user = authenticate(username=username, password=password)
+            if user and user.is_staff:
+                login(request, user)
+                return redirect('/list')
+            else:
+                return render(request, self.template_name, {'form': form,"message":"username or password is incorrect"})
+        else:
+            # Handle the case when the form is not valid
+            # You might want to render the form again with errors
+            return render(request, self.template_name, {'form': form, 'message':"invalid data"})
+
