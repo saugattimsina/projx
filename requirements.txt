@@ -1,0 +1,8 @@
+Django==4.2.5 # https://docs.djangoproject.com/en/4.2/
+python-dotenv==1.0.0 # https://github.com/theskumar/python-dotenv
+djangorestframework==3.14.0 # https://www.django-rest-framework.org/
+mysqlclient==2.2.0 # https://mysqlclient.readthedocs.io/
+requests==2.31.0 # https://requests.readthedocs.io/en/latest/
+celery==5.3.4 # https://docs.celeryq.dev/en/stable/getting-started/introduction.html
+python-telegram-bot==20.5 # https://docs.python-telegram-bot.org/en/v20.5/index.html
+ccxt==4.0.101 # https://docs.ccxt.com/#/
