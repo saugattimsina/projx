@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'accounts',
     'signalbot',
     # 'django_telethon',
-    'rest_framework'
+    'rest_framework',
+    'subscription',
 ]
 if DEBUG:
     # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -162,3 +163,8 @@ TELEGRAM_WEBHOOK_TOKEN = "somerandomstring"
 CELERY_BROKER_URL = "redis://redis_server:6379/0"
 
 CELERY_RESULT_BACKEND = "redis://redis_server:6379/0"
+
+now_payment_key= 'C73MTP8-QWG4EBT-HRWN2TQ-MYQ3K0S'
+
+
+

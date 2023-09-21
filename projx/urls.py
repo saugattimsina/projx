@@ -22,6 +22,7 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 # from django_telethon.urls import django_telethon_urls
 
+
 admin.autodiscover()
 
 urlpatterns = [
@@ -30,6 +31,8 @@ urlpatterns = [
     path("",include('user.urls')),
     path("",include('accounts.urls')),
     path("trade/",include('signalbot.urls')),
+    path("subscription/",include('subscription.urls')),
+
     # path('telegram/', django_telethon_urls()),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
