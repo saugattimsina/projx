@@ -1,8 +1,21 @@
-from rest_framework import serializers
+from datetime import datetime, timezone
+from io import BytesIO
+
+import pyotp
+import qrcode
+
+from rest_framework import serializers, exceptions
+from rest_framework.authtoken.models import Token
+
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.core.files.base import ContentFile
+from django.utils.crypto import get_random_string
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password, check_password
 
 User = get_user_model()
 
@@ -18,12 +31,34 @@ class UserSerializer(serializers.ModelSerializer):
             "is_staff",
             "is_client",
             "telegram_id",
+            "qr_code",
         ]
 
 
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
+
+    def validate(self, attrs: dict):
+        user = authenticate(
+            request=self.context.get("request"),
+            username=attrs.get("username"),
+            password=attrs.get("password"),
+        )
+        if user is None:
+            raise exceptions.AuthenticationFailed("Invalid login details.")
+        else:
+            attrs["user_object"] = user
+        return super().validate(attrs)
+
+    def create(self, validated_data: dict):
+        user: User = validated_data.get("user_object")
+        totp = pyotp.TOTP(user.otp_base32).now()
+        user.login_otp = totp
+        user.otp_created_at = datetime.now(timezone.utc)
+        user.login_otp_used = False
+        user.save(update_fields=["login_otp", "otp_created_at", "login_otp_used"])
+        return user
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -64,8 +99,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError(
                 {
-                    "message": {"email": "This email is already registered."},
-                    "success": False,
+                    "email": "This email is already registered.",
                 }
             )
         return value
@@ -93,7 +127,68 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user.telegram_id = validated_data["telegram_id"]
         user.is_client = True
 
+        # for 2fa
+        otp_base32 = pyotp.random_base32()
+        otp_auth_url = pyotp.totp.TOTP(otp_base32).provisioning_uri(
+            name=email.lower(), issuer_name="projx"
+        )
+        stream = BytesIO()
+        image = qrcode.make(f"{otp_auth_url}")
+        image.save(stream)
+        user.qr_code = ContentFile(
+            stream.getvalue(), name=f"qr{get_random_string(10)}.png"
+        )
+        user.otp_base32 = otp_base32
+        user.otpauth_url = otp_auth_url
         # Save the user instance with custom fields
         user.save()
 
         return user
+
+
+class VerifyOTPSerializer(serializers.Serializer):
+    otp = serializers.CharField()
+    user_id = serializers.IntegerField()
+
+    def validate(self, attrs: dict):
+        user: User = User.objects.filter(id=attrs.get("user_id")).first()
+        if not user:
+            raise serializers.ValidationError("user id is wrong")
+
+        if attrs.get("otp") != user.login_otp:
+            if not user.is_valid_otp():
+                totp = pyotp.TOTP(user.otp_base32).now()
+                user.login_otp = totp
+                user.otp_created_at = datetime.now(timezone.utc)
+                user.login_otp_used = False
+                user.save(
+                    update_fields=["login_otp", "otp_created_at", "login_otp_used"]
+                )
+            raise serializers.ValidationError("Authentication Failed")
+        else:
+            if not user.is_valid_otp():
+                totp = pyotp.TOTP(user.otp_base32).now()
+                user.login_otp = totp
+                user.otp_created_at = datetime.now(timezone.utc)
+                user.login_otp_used = False
+                user.save(
+                    update_fields=["login_otp", "otp_created_at", "login_otp_used"]
+                )
+                raise serializers.ValidationError("OTP is wrong")
+        attrs["user"] = user
+        return super().validate(attrs)
+
+    def create(self, validated_data: dict):
+        user: User = validated_data.get("user")
+        token = Token.objects.get(user=user)
+        user.login_otp_used = True
+        user.save(update_fields=["login_otp_used"])
+        return {
+            "token": token.key,
+            "user": {
+                "user_id": user.id,
+                "username": user.username,
+                "image": user.image.path,
+                "is_client": user.is_client,
+            },
+        }
