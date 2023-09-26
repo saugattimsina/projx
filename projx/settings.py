@@ -32,8 +32,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-import os
-
 # Application definition
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
@@ -44,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'ckeditor',
     "user",
     "accounts",
     "signalbot",
@@ -54,6 +53,9 @@ INSTALLED_APPS = [
     "drf_yasg",
     # api
     "accountsapi",
+    'binarytree',
+    'treebeard',
+
 ]
 if DEBUG:
     # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -73,7 +75,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-import os
 
 ROOT_URLCONF = "projx.urls"
 

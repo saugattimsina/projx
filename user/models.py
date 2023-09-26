@@ -24,6 +24,8 @@ class User(AbstractUser):
     # is_agent = BooleanField(default=False)
     is_client = BooleanField(default=False)
     telegram_id = models.IntegerField(null=True,blank=True)
+    referal_code = models.CharField(max_length=255,null=True,blank=True)
+    refered = models.ForeignKey('self',on_delete=models.SET_NULL,null=True,blank=True)
     def get_absolute_url(self):
         """Get url for user's detail view.
 
