@@ -7,6 +7,10 @@ class MLMMember(MP_Node):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     sponsor = models.ForeignKey('MLMMember', on_delete=models.SET_NULL, null=True, blank=True)
     # Other fields to represent relevant information about the MLM member
+    
+    def __str__(self):
+        return self.name
+
     def get_parents_up_to_level(self, level):
         parents = []
         current_node = self.parent

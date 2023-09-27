@@ -1,22 +1,27 @@
 import requests
 import json
 import pprint
-url = "https://api-sandbox.nowpayments.io/v1/payment"
+url = "https://api.nowpayments.io/v1/payment"
 
 def get_payment_qr(price,username):
   payload = json.dumps({
-    "price_amount": price,
+    "price_amount": 10,
+    # "price",
     "price_currency": "usd",
     "pay_currency": "btc",
-    "ipn_callback_url": "http://96e9-2403-3800-323a-a782-41f0-7543-69d0-df68.ngrok-free.app/subscription/payment/",
-    "order_id": username,
+    "ipn_callback_url": "https://411a-2403-3800-323a-b25e-8150-b8af-4261-dfe5.ngrok-free.app/subscription/payment/",
+    "order_id": "ram",
+      # username,
     "order_description": "payment for subscription",
   })
   headers = {
-    'x-api-key': 'C73MTP8-QWG4EBT-HRWN2TQ-MYQ3K0S',
+    'x-api-key': '6E4MP38-0BQM52M-QYQJ8N5-Z4XE2VC',
     'Content-Type': 'application/json'
   }
 
   response = requests.request("POST", url, headers=headers, data=payload)
-
+  print(response.text)
   return response.json()
+
+
+# get_payment_qr(1,2)
