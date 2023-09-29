@@ -11,13 +11,32 @@ class MLMMember(MP_Node):
     def __str__(self):
         return self.name
 
-    def get_parents_up_to_level(self, level):
-        parents = []
-        current_node = self.parent
+    # def get_parents_up_to_level(self, level):
+    #     parents = []
+    #     current_node = self.parent
 
-        while current_node and level > 0:
-            parents.append(current_node)
-            current_node = current_node.parent
-            level -= 1
+    #     while current_node and level > 0:
+    #         parents.append(current_node)
+    #         current_node = current_node.parent
+    #         level -= 1
 
-        return parents
+    #     return parents
+    
+
+class MLMBinary(MP_Node):
+    name = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    # Parent binary node
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='parent_user')
+    
+    # Left child binary node
+    user_left = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='left')
+    
+    # Right child binary node
+    user_right = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='right')
+
+    # Other fields to represent relevant information about the MLM member
+    
+    def __str__(self):
+        return self.name.username
+    

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import MLMMember
+from .models import MLMMember,MLMBinary
 
 # admin.site.register(MLMMember)
 
@@ -14,4 +14,9 @@ from treebeard.forms import movenodeform_factory
 class MyAdmin(TreeAdmin):
     form = movenodeform_factory(MLMMember)
 
+class MyAdmin1(TreeAdmin):
+    form = movenodeform_factory(MLMBinary)
+
 admin.site.register(MLMMember, MyAdmin)
+
+admin.site.register(MLMBinary, MyAdmin1)

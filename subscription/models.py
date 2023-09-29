@@ -22,6 +22,7 @@ class UserSubcription(models.Model):
     plan = models.ForeignKey(Subscription, on_delete=models.CASCADE)
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(blank=True, null=True)
+    created_on = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-start_date"]

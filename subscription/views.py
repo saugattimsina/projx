@@ -11,7 +11,7 @@ class PaymentWebhook(APIView):
         data = request.data
         payment_id = data['payment_id']
         payment_status = data['payment_status']
-        pay_amount = data['pay_amount']
+        pay_amount = int(data['pay_amount'])
         username = data['order_id']
 
         if payment_status == "finished":
@@ -21,7 +21,7 @@ class PaymentWebhook(APIView):
             # user = payment.user
             # user.subscription = payment.subscription
             # user.save()
-            if pay_amount-payment.amount>0:
+            if int(pay_amount)-payment.amount>0:
                 payment.has_partial_payment = True
                 payment.remaining_amount = pay_amount-payment.amount
                 payment.save()
@@ -32,10 +32,13 @@ class PaymentWebhook(APIView):
                 # user = payment.user
                 # user.subscription = payment.subscription
                 # user.save()
+                # user_current_subscription = UserSubcription.objects.filter(user=payment.user,plan__package_type = 'paid').order_by('-id')
+                # if user_current_subscription:
+                #     user_package = user_current_subscription.first()
+                #     # user_package.end_date = user_package.end_date + timedelta(days=int(payment.subscription.time_in_days))
                 UserSubcription.objects.create(
                     user = payment.user,
                     plan = payment.subscription,
-                    end_date = payment.date_transaction
                 )
         return Response({"success": True})
     
