@@ -6,3 +6,6 @@ requests==2.31.0 # https://requests.readthedocs.io/en/latest/
 celery==5.3.4 # https://docs.celeryq.dev/en/stable/getting-started/introduction.html
 python-telegram-bot==20.5 # https://docs.python-telegram-bot.org/en/v20.5/index.html
 ccxt==4.0.101 # https://docs.ccxt.com/#/
+pillow==10.0.1
+pyotp==2.9.0 # https://pyauth.github.io/pyotp/
+qrcode==7.4.2 # https://github.com/lincolnloop/python-qrcode
