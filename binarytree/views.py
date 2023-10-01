@@ -79,40 +79,51 @@ def treeview(request):
 
 
 # Create your views here.
-def determinerank(user):
-    x = MLMMember.objects.get(user=user)
-    referred = x.get_children_count()
-    print(referred)
-    team_size = x.get_descendant_count()
-    print(team_size)
-    ranks = MLMRank.objects.filter(
-        min_referrals__lte=5,
-        max_referrals__gte=5,
-        min_team_size__lte=100,
-        max_team_size__gte=100,
-    ).first()
-    if ranks:
-        try:
-            print("hi")
-            user_rank = UserRank.objects.get(user=user).rank.name
-            print(ranks, user_rank)
-            if ranks.name != user_rank:
-                pass
-        except:
-            print("not found")
-        return ranks.name
+def determinerank(ancestors):
+    if len(ancestors) != 0:
+        for ancestor in ancestors:
+            user = ancestor.user
+            user_rank = UserRank.objects.get(user=user)
+            print(user)
+            print(user_rank.rank)
+            x = MLMMember.objects.get(user=user)
+            referrals = x.get_children_count()
+            team_size = x.get_descendant_count()
+            # Find the MLMRank object that matches the user's referrals.
+            rank_by_referrals = MLMRank.objects.filter(
+                min_referrals__lte=referrals,
+                max_referrals__gte=referrals,
+            ).first()
+
+            # Find the MLMRank object that matches the user's team size.
+            rank_by_team_size = MLMRank.objects.filter(
+                min_team_size__lte=team_size,
+                max_team_size__gte=team_size,
+            ).first()
+            # If the user's referrals and team size match the same rank, return that rank.
+            if rank_by_referrals == rank_by_team_size:
+                print(rank_by_referrals)
+                user_rank.rank = rank_by_referrals
+                user_rank.save()
+
+            # If the user's referrals and team size do not match the same rank, return the rank with the higher minimum value.
+            elif rank_by_referrals.min_referrals < rank_by_team_size.min_referrals:
+                print(rank_by_referrals)
+                user_rank.rank = rank_by_referrals
+                user_rank.save()
+
+            else:
+                print(rank_by_team_size)
+                user_rank.rank = rank_by_team_size
+                user_rank.save()
+            print(user_rank.rank)
     else:
-        ranks = MLMRank.objects.filter(
-            min_referrals=0,
-        ).first()
-        return ranks.name
+        print("empty")
 
 
 def determine_rank_in_tree(request):
-    x = MLMMember.objects.get(name="symbol")
+    user = User.objects.get(id=31)
+    x = MLMMember.objects.get(user=user)
     ancestors = x.get_ancestors()
-
-    for ancestor in ancestors:
-        print(ancestor.user)
-        print(determinerank(ancestor.user))
+    determinerank(ancestors)
     return HttpResponse("ok")
