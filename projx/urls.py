@@ -45,13 +45,18 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path("",TemplateView.as_view(template_name="index.html",extra_context={"next": "/dashboard/home/"}),name="home"),
-    path('admin/', admin.site.urls),
-    path("",include('user.urls')),
-    path("",include('accounts.urls')),
-    path("trade/",include('signalbot.urls')),
-    path("subscription/",include('subscription.urls')),
-
+    path(
+        "",
+        TemplateView.as_view(
+            template_name="index.html", extra_context={"next": "/dashboard/home/"}
+        ),
+        name="home",
+    ),
+    path("admin/", admin.site.urls),
+    path("", include("user.urls")),
+    path("", include("accounts.urls")),
+    path("trade/", include("signalbot.urls")),
+    path("subscription/", include("subscription.urls")),
     path(
         "api/list/v1/",
         schema_view.with_ui("swagger", cache_timeout=0),
@@ -66,6 +71,7 @@ urlpatterns = [
     ),
     path("admin/", admin.site.urls),
     path("", include("user.urls")),
+    path("binary/", include("binarytree.urls")),
     path("", include("accounts.urls")),
     path("a/", include("binarytree.urls")),
     path("trade/", include("signalbot.urls")),
