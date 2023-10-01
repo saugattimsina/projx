@@ -2,6 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from .models import MLMMember,MLMBinary
+# ,ForcedMatrix
 
 # admin.site.register(MLMMember)
 
@@ -20,3 +21,5 @@ class MyAdmin1(TreeAdmin):
 admin.site.register(MLMMember, MyAdmin)
 
 admin.site.register(MLMBinary, MyAdmin1)
+#
+# admin.site.register(ForcedMatrix, MyAdmin2)

@@ -67,6 +67,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("user.urls")),
     path("", include("accounts.urls")),
+    path("a/", include("binarytree.urls")),
     path("trade/", include("signalbot.urls")),
     # path('telegram/', django_telethon_urls()),
     # api

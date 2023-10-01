@@ -1,6 +1,7 @@
 from user.models import User  # Import the User model
 from django.db import models
 from treebeard.mp_tree import MP_Node
+from treebeard.ns_tree import NS_Node
 
 class MLMMember(MP_Node):
     name = models.CharField(max_length=255)
@@ -24,6 +25,8 @@ class MLMMember(MP_Node):
     
 
 class MLMBinary(MP_Node):
+
+    # node_order_by = ['']
     name = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     
     # Parent binary node
@@ -40,3 +43,7 @@ class MLMBinary(MP_Node):
     def __str__(self):
         return self.name.username
     
+# class ForcedMatrix(NS_Node):
+#     name = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+#     def __str__(self):
+#         return self.name.username
