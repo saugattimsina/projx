@@ -73,3 +73,12 @@ class UserRank(models.Model):
 
     def __str__(self):
         return f"{self.user.username} {self.rank.name}"
+
+
+# class EquivaletLivegood(models.Model):
+#     name = models.CharField(max_length=250)
+#     livegood_equivalent_name = models.CharField(max_length=250, choices=
+#                                                 (
+#                                                     ("0", "unranked"),
+#                                                     ("")
+#                                                 ))

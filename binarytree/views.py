@@ -121,9 +121,69 @@ def determinerank(ancestors):
         print("empty")
 
 
-def determine_rank_in_tree(request):
-    user = User.objects.get(id=31)
+def weekly_fast_start_commissions(ancestors):
+    membership_amount = 40
+    level = len(ancestors)
+    for ancestor in ancestors:
+        user = ancestor.user
+        rank = UserRank.objects.get(user=user).rank.name
+        print("user :", user)
+        print("rank :", rank)
+        print("level :", level)
+        level = level - 1
+        if level == 1:
+            print(f"commision {membership_amount*0.5}")
+        elif (
+            level == 2
+            and rank == "Bronze"
+            or rank == "Silver"
+            or rank == "Gold"
+            or rank == "Platinum"
+            or rank == "Diamond"
+        ):
+            print(f"commision {membership_amount*0.1}")
+        elif (
+            level == 3
+            or level == 4
+            and rank == "Silver"
+            or rank == "Gold"
+            or rank == "Platinum"
+            or rank == "Diamond"
+        ):
+            print(f"commision {membership_amount*0.05}")
+        elif level == 5 and rank == "Platinum" or rank == "Diamond" or rank == "Gold":
+            print(f"commision {membership_amount*0.03}")
+        elif level == 6 and rank == "Platinum" or rank == "Diamond" or rank == "Gold":
+            print(f"commision {membership_amount*0.02}")
+        elif level == 7 and rank == "Platinum" or rank == "Diamond":
+            print(f"commision {membership_amount*0.02}")
+        elif level == 8 and rank == "Platinum" or rank == "Diamond":
+            print(f"commision {membership_amount*0.01}")
+        elif level == 9 or level == 10 and rank == "Diamond":
+            print(f"commision {membership_amount*0.01}")
+        else:
+            print("no commisions")
+
+
+def print_children_with_levels(node, level=0):
+    print("  " * level + f"Level {level}: {node}")
+
+    children = node.get_children()
+    for child in children:
+        print_children_with_levels(child, level + 1)
+
+
+def matrix_commision(user):
+    user_rank = UserRank.objects.get(user=user)
     x = MLMMember.objects.get(user=user)
-    ancestors = x.get_ancestors()
-    determinerank(ancestors)
+    print_children_with_levels(x)
+
+
+def determine_rank_in_tree(request):
+    user = User.objects.get(id=24)
+    x = MLMMember.objects.get(user=user)
+    # ancestors = x.get_ancestors()
+    # # determinerank(ancestors)
+    # weekly_fast_start_commissions(ancestors)
+    matrix_commision(user)
     return HttpResponse("ok")

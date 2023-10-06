@@ -72,19 +72,19 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = [
             "username",
             "name",
-            "image",
-            "telegram_id",
+            # "image",
             "email",
             "password",
             "confirm_password",
+            "refered",
         ]
         extra_kwargs = {"password": {"write_only": True}, "image": {"required": True}}
 
-    def validate_image(self, value):
-        # Check if the uploaded image is greater than 2 MB (2 * 1024 * 1024 bytes)
-        if value.size > 2 * 1024 * 1024:
-            raise serializers.ValidationError(_("Image size should not exceed 2 MB."))
-        return value
+    # def validate_image(self, value):
+    #     # Check if the uploaded image is greater than 2 MB (2 * 1024 * 1024 bytes)
+    #     if value.size > 2 * 1024 * 1024:
+    #         raise serializers.ValidationError(_("Image size should not exceed 2 MB."))
+    #     return value
 
     def validate_password(self, value):
         # Use Django's built-in password validation to check password strength
@@ -122,9 +122,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(
             validated_data["username"], password=password, email=validated_data["email"]
         )
-        user.image = validated_data["image"]
+        # user.image = validated_data["image"]
         user.name = validated_data["name"]
-        user.telegram_id = validated_data["telegram_id"]
+        # user.telegram_id = validated_data["telegram_id"]
         user.is_client = True
 
         # for 2fa
