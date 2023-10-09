@@ -26,10 +26,12 @@ class User(AbstractUser):
     is_staff = BooleanField(default=False)
     # is_agent = BooleanField(default=False)
     is_client = BooleanField(default=False)
-    telegram_id = models.IntegerField(null=True,blank=True)
-    referal_code = models.CharField(max_length=255,null=True,blank=True)
-    refered = models.ForeignKey('self',on_delete=models.SET_NULL,null=True,blank=True)
-    is_suscribed = models.BooleanField(default=False,null=True,blank=True)
+    telegram_id = models.IntegerField(null=True, blank=True)
+    referal_code = models.CharField(max_length=255, null=True, blank=True)
+    refered = models.ForeignKey(
+        "self", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    is_suscribed = models.BooleanField(default=False, null=True, blank=True)
     # is_active = models.BooleanField(default=False,null=True,blank=True)
     # is_first_month = models.BooleanField(default=True,null=True,blank=True)
     referal_code = models.CharField(max_length=255, null=True, blank=True)
@@ -37,7 +39,7 @@ class User(AbstractUser):
         "self", on_delete=models.SET_NULL, null=True, blank=True
     )
     otpauth_url = models.CharField(max_length=225, blank=True, null=True)
-    otp_base32 = models.CharField(max_length=255, null=True)
+    otp_base32 = models.CharField(max_length=255, null=True, blank=True)
     qr_code = models.ImageField(upload_to="qrcode/", blank=True, null=True)
     login_otp = models.CharField(max_length=255, null=True, blank=True)
     login_otp_used = models.BooleanField(default=True)

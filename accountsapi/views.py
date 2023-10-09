@@ -27,7 +27,9 @@ class UserLoginApiView(GenericAPIView):
         responses={200: UserLoginSerializer}, operation_summary="Api for Login user"
     )
     def post(self, request, format=None):
-        serializer = self.get_serializer(data=request.data,context={"request": request})
+        serializer = self.get_serializer(
+            data=request.data, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         if user is not None:
@@ -37,7 +39,6 @@ class UserLoginApiView(GenericAPIView):
                     "data": {
                         "user_id": user.id,
                         "username": user.username,
-                        "qr_code": user.qr_code.url,
                     },
                     "message": "Login Successful. Proceed to 2FA",
                 },
@@ -64,7 +65,7 @@ class UserRegistrationApiView(GenericAPIView):
             token, created = Token.objects.get_or_create(user=user)
             return Response(
                 {
-                    "message": "Registration Success",
+                    "message": "Registration Success. Proceed to 2FA",
                     "sucess": True,
                     "data": {
                         "token": token.key,
@@ -73,6 +74,7 @@ class UserRegistrationApiView(GenericAPIView):
                             "username": user.username,
                             "image": user.image.path,
                             "is_client": user.is_client,
+                            "qr_code": user.qr_code.url,
                         },
                     },
                 },
@@ -93,7 +95,7 @@ class VerityOTPView(GenericAPIView):
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            user_id = serializer.validated_data("user_id")
+            user_id = serializer.validated_data["user_id"]
             user = User.objects.filter(id=user_id).first()
             login_info: dict = serializer.save()
             return Response(
