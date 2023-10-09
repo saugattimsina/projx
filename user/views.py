@@ -250,7 +250,7 @@ class UserLoginView(FormView):
                 login(request, user)
                 return redirect('/list')
             else:
-                return render(request, self.template_name, {'form': form,"message":"username or password is incorrect"})
+                return render(request, self.template_name, {'form': form,"message":f"{user} username or password is incorrect"})
         else:
             # Handle the case when the form is not valid
             # You might want to render the form again with errors
