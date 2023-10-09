@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="test" style="margin-top: 5rem;">
+
+</div>
+<div class="row">
+<div class="col-md-8">
+
+</div>
+    <div class="col-md-4">
+        <form method="post" action="{% url 'signalbot:create-pairs' %}">
+            {% csrf_token %}
+            <input type="submit" value="Update Pairs">
+        </form>
+    </div>
+</div>
+<div class="row">
+<div class="col-md-8">
+    <table class="table table-dark">
+    <thead>
+        <tr>
+            <th>
+                Symbol
+            </th>
+            <th>
+                Base Asset
+            </th>
+            <th>
+                Quote Asset
+            </th>
+            <th>
+                Actions
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pair in pairs %}
+        <tr>
+            <td>
+                {{pair.symbol}}
+            </td>
+            <td>
+                {{pair.base_asset}}
+            </td>
+            <td>
+                {{pair.quote_asset}}
+            </td>
+            <td>
+                <input type='button' value="Show Pair Info" onclick="get_pair_info('{{ pair.symbol }}')">
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+<div class="col-md-4">
+    <div class="show-pair-info" id="show-pair-info">
+
+
+
+    </div>
+
+</div>
+</div>
+
+{% block javascript %}
+    
+    <script>
+        function get_pair_info(symbol){
+            $.ajax({
+                url: "{% url 'signalbot:get-pair-info' %}",
+                type: "GET",
+                data: {
+                    'symbol': symbol
+                },
+                success: function(response){
+                    var data = response.symbol
+                    if (response.success){
+                        console.log(response.symbol)
+                        var filters = data.filters
+                        var pre = ""
+                        for (var i = 0 ; i<filters.length;i++ ){
+                            if (filters[i].filterType == 'PRICE_FILTER'){
+                                pre += `
+                               <p>
+                                 Filter Type: ${filters[i].filterType}
+                               </p>
+                                
+                                  
+                                    <p>
+                                    max price: ${filters[i].maxPrice}
+                                    </p>
+                                    <p>
+                                    min price: ${filters[i].minPrice}
+                                    </p>
+                                    
+                                   <hr> 
+                                `
+
+                            }
+                            else if (filters[i].filterType == 'LOT_SIZE'){
+                                pre += `
+                               <p>
+                                 Filter Type: ${filters[i].filterType}
+                               </p>
+                                
+                                  
+                                    <p>
+                                    Min Qty: ${filters[i].minQty}
+                                    </p>
+                                    <p>
+                                    Max Qty: ${filters[i].maxQty}
+                                    </p>
+                                    <p>
+                                    Step Size: ${filters[i].stepSize}
+                                    </p>
+                                   <hr> 
+                                `
+
+                            }
+                               
+
+                        }
+                        var x = `
+                            <p>Symbol: ${data.symbol}</p>
+                            <p>Base Asset: ${data.baseAsset}</p>
+                            <p>Quote Asset: ${data.quoteAsset}</p>
+                            ${pre}
+
+
+                            `
+                        document.getElementById('show-pair-info').innerHTML = ""
+                        document.getElementById('show-pair-info').innerHTML = x
+                    }
+                }
+            })
+        }
+
+    </script>
+    
+{% endblock javascript %}
+{% endblock content %}

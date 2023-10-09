@@ -17,14 +17,36 @@ quantity = 100
 # leverage = 0
 # trailing_stop_percent = 1
 # take_profit_percent = 2
+exchange = ccxt.binance(
+    {
+        "enableRateLimit": True,
+        "options": {"defaultType": "future"},
+    })
+exchange.set_sandbox_mode(True)
+def get_market_price_status(symbol):
+    ticker = exchange.fetch_ticker(symbol)
+    current_price = ticker['last']
+    print(current_price)
+    return current_price
 
-# Initialize Binance exchange instance
+
 def create_my_trade(signal_obj,user,userkey):
+    
     symbol = signal_obj.symbol
+    price_now = get_market_price_status()
+
     price = signal_obj.price
     stop_price = signal_obj.stop_amount
     profit_price = signal_obj.take_profit_amount
-    exchange = ccxt.binance(
+
+    """the trade could not be set in this condition"""
+    if not price_now > stop_price:
+        print(price_now,stop_price)
+        print("price is not good")
+        return False
+
+
+    exchange1 = ccxt.binance(
         {
             "apiKey": userkey.api_key,
             "secret": userkey.api_secret,
@@ -33,20 +55,23 @@ def create_my_trade(signal_obj,user,userkey):
             "options": {"defaultType": "future"},
         }
     )
-    exchange.set_sandbox_mode(True)
+    exchange1.set_sandbox_mode(True)
 
     SignalFollowedBy.objects.create(user=user,signal=signal_obj)
     # try:
     # help(exchange.create_order)
+    
     try:
-        create_order = exchange.create_order(
-            symbol=symbol,
-            type="LIMIT",
-            side=trade_side,
-            amount=quantity,
-            price=price,
-        )
-        print(create_order)
+        create_order = exchange1.create_order(
+                symbol=symbol,
+                type="LIMIT",
+                side=trade_side,
+                amount=quantity,
+                price=price,
+            )
+       
+    except Exception as e:
+        return "order could not be placed"
         inverted_side = 'sell'
 
         stopLossParams = {'stopPrice': stop_price}
@@ -56,9 +81,10 @@ def create_my_trade(signal_obj,user,userkey):
         takeProfitParams = {'stopPrice': profit_price}
         takeProfitOrder = exchange.create_order(symbol, 'TAKE_PROFIT_MARKET', inverted_side, quantity, price, takeProfitParams)
         print(takeProfitOrder)
+        exchange.close()
 
-    except Exception as e:
-        print(e)
+ 
+        exchange.close()
 
 
 
@@ -77,3 +103,26 @@ def create_my_trade(signal_obj,user,userkey):
 #     price=0.52,
 #     params={"stopPrice": stop_price},
 # )
+
+
+# order_info = exchange.fetch_order(order_id, 'BTC/USDT')
+
+
+
+
+def all_symbols():
+    exchange = ccxt.binance({
+        'rateLimit': 2000,  # Adjust this rate limit as needed
+        'enableRateLimit': True,
+        'options': {
+            'defaultType': 'future',
+        }
+    })
+
+    # Fetch all available markets (symbols) for Binance Futures
+    markets = exchange.fetch_markets()
+
+    # Print the list of trading symbols
+    for market in markets:
+        print(market['symbol'])
+# all_symbols()

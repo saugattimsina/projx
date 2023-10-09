@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 
 # Create your views he
 import queue
 
-from .models import TradeSignals,SignalFollowedBy
+from .models import TradeSignals,SignalFollowedBy,TradeSymbol
 from .forms import TradeSignalsForm
 from django.views.generic import CreateView,ListView
 from django.urls import reverse_lazy
@@ -15,6 +15,8 @@ from django.conf import settings
 from .utils import process_telegram_message
 from rest_framework import status
 from django.db.models import Count
+import ccxt
+from jsonview.decorators import json_view
 
 class TradeCreateView(CreateView):
     model = TradeSignals
@@ -63,3 +65,70 @@ class DisplaySignalFollowers(ListView):
         signal_id = self.kwargs['signal_id']  # Get the signal_id from URL parameter
         queryset = SignalFollowedBy.objects.filter(signal_id=signal_id)
         return queryset
+    
+
+def all_symbols():
+    exchange = ccxt.binance({
+        'rateLimit': 2000,  # Adjust this rate limit as needed
+        'enableRateLimit': True,
+        'options': {
+            'defaultType': 'future',
+        }
+    })
+
+    # Fetch all available markets (symbols) for Binance Futures
+    markets = exchange.fetch_markets()
+
+    # Print the list of trading symbols
+    # carry = []
+    for market in markets:
+        info = market["info"]
+        # print(info)
+        pair = info.get("pair",info.get("symbol"))
+        base_asset = info.get("baseAsset")
+        quote_asset = info.get("quoteAsset")
+        TradeSymbol.objects.get_or_create(symbol=pair,base_asset=base_asset,quote_asset=quote_asset)
+
+    return "true"
+class ShowPairs(ListView):
+    model = TradeSymbol
+    template_name = 'binance/show_pairs.html'
+    context_object_name = 'pairs'
+
+
+
+def ADDPairs(request):
+    if request.method == 'POST':
+        print("recive request to get pairs")
+        all_symbols()
+        return redirect(reverse_lazy("signalbot:show-pairs"))
+    if request.method == 'GET':
+       return redirect(reverse_lazy("signalbot:show-pairs"))
+
+
+@json_view
+def pair_info(request):
+    print("got request")
+    exchange = ccxt.binance({
+        'rateLimit': 2000,  # Adjust this rate limit as needed
+        'enableRateLimit': True,
+        'options': {
+            'defaultType': 'future',
+        }
+    })
+
+    # Fetch all available markets (symbols) for Binance Futures
+    markets = exchange.fetch_markets()
+    # print(request.GET['symbol'])
+    required_symbol = request.GET['symbol']
+    data = ""
+    for symbol in markets:
+        if symbol['info'].get("pair",symbol['info'].get("symbol")) == required_symbol:
+            # print(symbol)
+            data =  symbol["info"]
+            # break
+            return {"success":True,"symbol":data}
+
+            # return {"symbol":
+    return {"success":False}
+

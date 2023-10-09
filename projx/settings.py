@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     "accountsapi",
     'binarytree',
     'treebeard',
+    'django_crontab',
+    'wallet',
 
 ]
 if DEBUG:
@@ -186,3 +188,8 @@ SWAGGER_SETTINGS = {
     },
     "SECURITY_REQUIREMENTS": [{"Token": []}],
 }
+
+
+CRONJOBS = [
+    ('* * * * *', 'binarytree.utils.create_user_payment'),
+]
