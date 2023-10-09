@@ -72,8 +72,9 @@ be added tooo first need to finish the binary model
 def create_default_subscription(sender, instance, created, **kwargs):
     if created:
         default_subscription = Subscription.objects.get(package_type='free')
-        if default_subscription:
-            UserSubcription.objects.create(user=instance, plan=default_subscription)
+        if not instance.is_superuser:
+            if default_subscription:
+                UserSubcription.objects.create(user=instance, plan=default_subscription)
 
         if instance.is_superuser:
             MLMMember.add_root(user=instance, name=instance.username)
