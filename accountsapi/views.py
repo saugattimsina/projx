@@ -24,10 +24,10 @@ class UserLoginApiView(GenericAPIView):
     serializer_class = UserLoginSerializer
 
     @swagger_auto_schema(
-        responses={200: UserSerializer}, operation_summary="Api for Login user"
+        responses={200: UserLoginSerializer}, operation_summary="Api for Login user"
     )
     def post(self, request, format=None):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data,context={"request": request})
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         if user is not None:

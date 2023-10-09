@@ -40,11 +40,14 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate(self, attrs: dict):
+        print(attrs.get("username"))
+        print(attrs.get("password"))
         user = authenticate(
-            request=self.context.get("request"),
+            # request=self.context.get("request"),
             username=attrs.get("username"),
             password=attrs.get("password"),
         )
+        print(user)
         if user is None:
             raise exceptions.AuthenticationFailed("Invalid login details.")
         else:
@@ -53,10 +56,12 @@ class UserLoginSerializer(serializers.Serializer):
 
     def create(self, validated_data: dict):
         user: User = validated_data.get("user_object")
+        print(user)
         totp = pyotp.TOTP(user.otp_base32).now()
         user.login_otp = totp
         user.otp_created_at = datetime.now(timezone.utc)
         user.login_otp_used = False
+        user.is_active =True
         user.save(update_fields=["login_otp", "otp_created_at", "login_otp_used"])
         return user
 
@@ -73,10 +78,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
             "username",
             "name",
             "image",
-            "telegram_id",
+            # "telegram_id",
             "email",
             "password",
             "confirm_password",
+            "refered",
         ]
         extra_kwargs = {"password": {"write_only": True}, "image": {"required": True}}
 
@@ -119,12 +125,16 @@ class RegistrationSerializer(serializers.ModelSerializer):
         self.validate_email(email)
 
         # Create the user instance without custom fields
-        user = User.objects.create_user(
-            validated_data["username"], password=password, email=validated_data["email"]
+        user = User(
+            username =validated_data["username"], email=validated_data["email"]
         )
         user.image = validated_data["image"]
         user.name = validated_data["name"]
-        user.telegram_id = validated_data["telegram_id"]
+        user.set_password(password)
+        # user.telegram_id = validated_data["telegram_id"]
+        print(validated_data["refered"])
+        user.refered =  validated_data["refered"]
+        # print(refered)
         user.is_client = True
 
         # for 2fa
@@ -147,8 +157,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class VerifyOTPSerializer(serializers.Serializer):
-    otp = serializers.CharField()
-    user_id = serializers.IntegerField()
+    otp = serializers.CharField(required=True)
+    user_id = serializers.IntegerField(required=True)
 
     def validate(self, attrs: dict):
         user: User = User.objects.filter(id=attrs.get("user_id")).first()

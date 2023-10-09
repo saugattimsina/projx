@@ -244,14 +244,12 @@ class UserLoginView(FormView):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
 
-            # user = authenticate(username=username, password=password)
-            user = User.objects.filter(username=username).first()
-            if user: 
-                # and user.is_staff:
+            user = authenticate(username=username, password=password)
+            if user and user.is_staff:
                 login(request, user)
                 return redirect('/list')
             else:
-                return render(request, self.template_name, {'form': form,"message":f"{user} username or password is incorrect"})
+                return render(request, self.template_name, {'form': form,"message":"username or password is incorrect"})
         else:
             # Handle the case when the form is not valid
             # You might want to render the form again with errors
