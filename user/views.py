@@ -246,7 +246,8 @@ class UserLoginView(FormView):
 
             # user = authenticate(username=username, password=password)
             user = User.objects.filter(username=username).first()
-            if user and user.is_staff:
+            if user: 
+                # and user.is_staff:
                 login(request, user)
                 return redirect('/list')
             else:
