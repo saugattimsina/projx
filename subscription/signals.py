@@ -99,68 +99,68 @@ def create_default_subscription(sender, instance, created, **kwargs):
         #         else:
         #             """move to right"""
         
-
-        binary_members = MLMBinary.objects.all()
-        if binary_members.count() == 0:
-            print("yaha1")
-            MLMBinary.add_root(name=instance)
-        else:
-            print('yaha2')
-            parentbinary = MLMBinary.objects.get(name = instance.refered)
-            print("parent_binary",parentbinary)
-            # siblings = parent.get_siblings()
-            decends = parentbinary.get_children_count()
-            print("munber of decends ",decends)
-            if not decends :
-                print('yah3')
-                x = parentbinary.add_child(name=instance,parent=parentbinary)
-                parentbinary.user_left = x
-                parentbinary.save()
-            elif (decends == 1):
-                print('yah44')
-
-                x = parentbinary.add_child(name=instance,parent=parentbinary)
-                parentbinary.user_right = x
-                parentbinary.save()
-            elif(decends == 2):
-                print('yah5')
-                get_all_childs = parent.get_children_count()
-                # print(get_all_childs)
-                if get_all_childs % 2 == 1:
-                    print('yah6')
-                    left_user = parentbinary.get_children().first()
-                    node = get_all_nodes_bfs(left_user)
-                    spilled_parent = node['node']
-                    child_num = node['children']
-                    if child_num == 0:
-                        x =  spilled_parent.add_child(name=instance,parent=spilled_parent)
-                        spilled_parent.user_left = x
-                        spilled_parent.save()
-                    elif child_num == 1:
-                        x =  spilled_parent.add_child(name=instance,parent=spilled_parent)
-                        spilled_parent.user_right = x
-                        spilled_parent.save()
-                    print("left user",left_user)
-                    """ need to add user in the left wing """
-                else:
-                    print('yah7')
-                    right_user = parentbinary.get_children().last()
-                    node = get_all_nodes_bfs(right_user)
-                    spilled_parent = node['node']
-                    child_num = node['children']
-                    if child_num == 0:
-                        x =  spilled_parent.add_child(name=instance,parent=spilled_parent)
-                        spilled_parent.user_left = x
-                        spilled_parent.save()
-                    elif child_num == 1:
-                        x =  spilled_parent.add_child(name=instance,parent=spilled_parent)
-                        spilled_parent.user_right = x
-                        spilled_parent.save()
-                   
-                    """ need to add user in the right wing """
+        if not instance.is_superuser:
+            binary_members = MLMBinary.objects.all()
+            if binary_members.count() == 0:
+                print("yaha1")
+                MLMBinary.add_root(name=instance)
             else:
-                print('oops something went wrong')
+                print('yaha2')
+                parentbinary = MLMBinary.objects.get(name = instance.refered)
+                print("parent_binary",parentbinary)
+                # siblings = parent.get_siblings()
+                decends = parentbinary.get_children_count()
+                print("munber of decends ",decends)
+                if not decends :
+                    print('yah3')
+                    x = parentbinary.add_child(name=instance,parent=parentbinary)
+                    parentbinary.user_left = x
+                    parentbinary.save()
+                elif (decends == 1):
+                    print('yah44')
 
-               
+                    x = parentbinary.add_child(name=instance,parent=parentbinary)
+                    parentbinary.user_right = x
+                    parentbinary.save()
+                elif(decends == 2):
+                    print('yah5')
+                    get_all_childs = parent.get_children_count()
+                    # print(get_all_childs)
+                    if get_all_childs % 2 == 1:
+                        print('yah6')
+                        left_user = parentbinary.get_children().first()
+                        node = get_all_nodes_bfs(left_user)
+                        spilled_parent = node['node']
+                        child_num = node['children']
+                        if child_num == 0:
+                            x =  spilled_parent.add_child(name=instance,parent=spilled_parent)
+                            spilled_parent.user_left = x
+                            spilled_parent.save()
+                        elif child_num == 1:
+                            x =  spilled_parent.add_child(name=instance,parent=spilled_parent)
+                            spilled_parent.user_right = x
+                            spilled_parent.save()
+                        print("left user",left_user)
+                        """ need to add user in the left wing """
+                    else:
+                        print('yah7')
+                        right_user = parentbinary.get_children().last()
+                        node = get_all_nodes_bfs(right_user)
+                        spilled_parent = node['node']
+                        child_num = node['children']
+                        if child_num == 0:
+                            x =  spilled_parent.add_child(name=instance,parent=spilled_parent)
+                            spilled_parent.user_left = x
+                            spilled_parent.save()
+                        elif child_num == 1:
+                            x =  spilled_parent.add_child(name=instance,parent=spilled_parent)
+                            spilled_parent.user_right = x
+                            spilled_parent.save()
+                    
+                        """ need to add user in the right wing """
+                else:
+                    print('oops something went wrong')
+
+                
+                
             
-        
