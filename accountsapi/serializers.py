@@ -7,6 +7,8 @@ import qrcode
 from rest_framework import serializers, exceptions
 from rest_framework.authtoken.models import Token
 
+from user.models import UserKey
+
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
@@ -61,7 +63,6 @@ class UserLoginSerializer(serializers.Serializer):
         user.login_otp = totp
         user.otp_created_at = datetime.now(timezone.utc)
         user.login_otp_used = False
-        user.is_active =True
         user.save(update_fields=["login_otp", "otp_created_at", "login_otp_used"])
         return user
 
@@ -70,7 +71,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(
         style={"input_type": "password"}, write_only=True
     )
-    email = serializers.EmailField()  # Add the "email" field here
+    email = serializers.EmailField()
 
     class Meta:
         model = User
@@ -125,31 +126,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
         self.validate_email(email)
 
         # Create the user instance without custom fields
-        user = User(
-            username =validated_data["username"], email=validated_data["email"]
-        )
+        user = User(username=validated_data["username"], email=validated_data["email"])
         user.image = validated_data["image"]
         user.name = validated_data["name"]
         user.set_password(password)
         # user.telegram_id = validated_data["telegram_id"]
         print(validated_data["refered"])
-        user.refered =  validated_data["refered"]
+        user.refered = validated_data["refered"]
         # print(refered)
         user.is_client = True
-
-        # for 2fa
-        otp_base32 = pyotp.random_base32()
-        otp_auth_url = pyotp.totp.TOTP(otp_base32).provisioning_uri(
-            name=email.lower(), issuer_name="projx"
-        )
-        stream = BytesIO()
-        image = qrcode.make(f"{otp_auth_url}")
-        image.save(stream)
-        user.qr_code = ContentFile(
-            stream.getvalue(), name=f"qr{get_random_string(10)}.png"
-        )
-        user.otp_base32 = otp_base32
-        user.otpauth_url = otp_auth_url
         # Save the user instance with custom fields
         user.save()
 
@@ -165,25 +150,16 @@ class VerifyOTPSerializer(serializers.Serializer):
         if not user:
             raise serializers.ValidationError("user id is wrong")
 
-        if attrs.get("otp") != user.login_otp:
-            if not user.is_valid_otp():
-                totp = pyotp.TOTP(user.otp_base32).now()
-                user.login_otp = totp
-                user.otp_created_at = datetime.now(timezone.utc)
-                user.login_otp_used = False
-                user.save(
-                    update_fields=["login_otp", "otp_created_at", "login_otp_used"]
-                )
-            raise serializers.ValidationError("Authentication Failed")
-        else:
-            if not user.is_valid_otp():
-                totp = pyotp.TOTP(user.otp_base32).now()
-                user.login_otp = totp
-                user.otp_created_at = datetime.now(timezone.utc)
-                user.login_otp_used = False
-                user.save(
-                    update_fields=["login_otp", "otp_created_at", "login_otp_used"]
-                )
+        if attrs.get("otp") != user.login_otp or not user.is_valid_otp():
+            totp = pyotp.TOTP(user.otp_base32).now()
+            user.login_otp = totp
+            user.otp_created_at = datetime.now(timezone.utc)
+            user.login_otp_used = False
+            user.save(update_fields=["login_otp", "otp_created_at", "login_otp_used"])
+
+            if attrs.get("otp") != user.login_otp:
+                raise serializers.ValidationError("OTP is wrong")
+            else:
                 raise serializers.ValidationError("OTP is wrong")
         attrs["user"] = user
         return super().validate(attrs)
@@ -202,3 +178,9 @@ class VerifyOTPSerializer(serializers.Serializer):
                 "is_client": user.is_client,
             },
         }
+
+
+class UserBinancyAPIKey(serializers.ModelSerializer):
+    class Meta:
+        model = UserKey
+        fields = ["api_key", "api_secret"]
