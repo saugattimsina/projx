@@ -136,3 +136,5 @@ class TradeHistory(APIView):
             return Response(data, status=status.HTTP_200_OK)
         else:
             return Response({"data":[],"message": serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+
+

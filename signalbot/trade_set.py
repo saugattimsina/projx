@@ -1,6 +1,6 @@
 # Trading parameters
 import ccxt
-from .models import SignalFollowedBy
+from .models import SignalFollowedBy,Portfolio
 
 # BINANCETN_API_KEY = "568fbe6822165f8feb172cd10ce0e1c39bd61f1102fab71d95fb9860eb94b226"
 # BINANCETN_API_SECRET = "cc8c83dd0013595db27a932f5eeda3f677beb5cd1e3c351b1e9b4b3c21a6364f"
@@ -57,7 +57,7 @@ def create_my_trade(signal_obj,user,userkey):
     )
     exchange1.set_sandbox_mode(True)
 
-    SignalFollowedBy.objects.create(user=user,signal=signal_obj)
+    follower = SignalFollowedBy.objects.create(user=user,signal=signal_obj)
     # try:
     # help(exchange.create_order)
     
@@ -69,43 +69,39 @@ def create_my_trade(signal_obj,user,userkey):
                 amount=quantity,
                 price=price,
             )
+        print(create_order)
        
     except Exception as e:
+        follower.is_cancelled = True
+        follower.save()
         return "order could not be placed"
-        inverted_side = 'sell'
-
+    inverted_side = 'sell'
+    try:
         stopLossParams = {'stopPrice': stop_price}
         stopLossOrder = exchange.create_order(symbol, 'STOP_MARKET', inverted_side, quantity, price, stopLossParams)
         print(stopLossOrder)
-
-        takeProfitParams = {'stopPrice': profit_price}
+    except Exception as e:
+        print(e)
+        follower.is_cancelled = True
+        follower.save()
+        '''need to cancel create orser if exixts'''
+        exchange.cancel_order(create_order['id'], symbol=symbol)
+        return "stop loss could not be placed"
+    takeProfitParams = {'stopPrice': profit_price}
+    try:
         takeProfitOrder = exchange.create_order(symbol, 'TAKE_PROFIT_MARKET', inverted_side, quantity, price, takeProfitParams)
         print(takeProfitOrder)
-        exchange.close()
+    except Exception as e:
+        print(e)
+        '''need to cancel create orser if exixts'''
+        exchange.cancel_order(create_order['id'], symbol=symbol)
+        exchange.cancel_order(stopLossOrder['id'], symbol=symbol)
+        follower.is_cancelled = True
+        follower.save()
+        return "take profit could not be placed"
+    Portfolio.objects.create(user=user,symbol=symbol,quantity=quantity,entry_price=price,stop_price=stop_price,take_profit_price=profit_price)
+    exchange.close()
 
- 
-        exchange.close()
-
-
-
-# create_stoploss_order = exchange.create_stop_loss_order(
-#     symbol=symbol,
-#     amount=quantity,
-#     price=stop_price,
-#     )
-
-
-# x = exchange.create_limit_sell_order(
-#     symbol=symbol,
-#     type="STOP_LOSS",
-#     side=trade_side,
-#     amount=quantity,
-#     price=0.52,
-#     params={"stopPrice": stop_price},
-# )
-
-
-# order_info = exchange.fetch_order(order_id, 'BTC/USDT')
 
 
 
