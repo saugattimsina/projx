@@ -7,6 +7,8 @@ import qrcode
 from rest_framework import serializers, exceptions
 from rest_framework.authtoken.models import Token
 
+from user.models import UserKey
+
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
@@ -176,3 +178,9 @@ class VerifyOTPSerializer(serializers.Serializer):
                 "is_client": user.is_client,
             },
         }
+
+
+class UserBinancyAPIKey(serializers.ModelSerializer):
+    class Meta:
+        model = UserKey
+        fields = ["api_key", "api_secret"]
