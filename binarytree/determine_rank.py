@@ -1,4 +1,4 @@
-from binarytree.models import MLMMember, MLMRank
+from binarytree.models import MLMMember, MLMRank,MLMBinary
 from django.db.models import Q
 
 
@@ -21,3 +21,16 @@ def find_all_parent_node(user):
     for ancestor in ancestors:
         print(ancestor.user)
         determinerank(ancestor.user)
+
+
+
+
+def create_parents_binary(user):
+
+    binary_pos = MLMBinary.objects.filter(name=user)
+    if binary_pos.exists():
+        ancestors = binary_pos[0].get_ancestors()
+        print(ancestors)
+        
+    else:
+        return None

@@ -52,4 +52,52 @@ class TradeHistory(models.Model):
     fee_currency = models.CharField(max_length=255)
     created_on = models.DateTimeField(null=True,blank=True)
 
- 
+class ReferalWallet(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    amount = models.FloatField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    # is_withdrawn = models.BooleanField(default=False)
+class ReferalWithdrawlHistory(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    amount = models.FloatField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    is_withdrawn = models.BooleanField(default=False)
+    address = models.CharField(max_length=255,null=True,blank=True)
+    txid = models.CharField(max_length=255,null=True,blank=True)
+    fee = models.FloatField(null=True,blank=True)
+    fee_currency = models.CharField(max_length=255,null=True,blank=True)
+
+
+class ReferalIncome(models.Model):
+    refered_by = models.ForeignKey(User,on_delete=models.CASCADE)
+    refered_user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='refered_to')
+    money_allocated_to = models.ForeignKey(User,on_delete=models.CASCADE,related_name='money_allocated_to')
+    amount = models.FloatField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    is_withdrawn = models.BooleanField(default=False)
+
+
+
+class Binawallet(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    amount = models.FloatField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    # is_withdrawn = models.BooleanField(default=False)
+
+class BinaryWithDrawlHistory(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    amount = models.FloatField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    is_withdrawn = models.BooleanField(default=False)
+    address = models.CharField(max_length=255,null=True,blank=True)
+    txid = models.CharField(max_length=255,null=True,blank=True)
+    fee = models.FloatField(null=True,blank=True)
+    fee_currency = models.CharField(max_length=255,null=True,blank=True)
+
+class BinaryIncome(models.Model):
+    paid_by = models.ForeignKey(User,on_delete=models.CASCADE)
+    money_allocated_to = models.ForeignKey(User,on_delete=models.CASCADE,related_name='binary_money_allocated_to')
+    amount = models.FloatField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    is_withdrawn = models.BooleanField(default=False)
+    for_month = models.DateField()
