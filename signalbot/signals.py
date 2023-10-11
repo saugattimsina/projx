@@ -1,4 +1,4 @@
-from signalbot.models import TradeSignals
+from signalbot.models import TradeSignals, TradeHistory
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
@@ -17,7 +17,6 @@ import json
 reply_url = f"https://api.telegram.org/bot{settings.TELEGRAM_API_TOKEN}/sendMessage"
 
 
-
 # Convert the keyboard dictionary to JSON format
 # @shared_task
 @receiver(post_save, sender=TradeSignals)
@@ -27,17 +26,35 @@ def create_default_subscription(sender, instance, created, **kwargs):
     users_with_uuid = User.objects.filter(user_uuid__isnull=False)
 
     keyboard = {
-    "inline_keyboard": [
-        [{"text": "Follow Signal", "callback_data": instance.id}],
-        # [{"text": "Option 2", "callback_data": "option2_data"}],
-        [{"text": "Open Google", "url": "https://www.google.com"}],
-    ]
+        "inline_keyboard": [
+            [{"text": "Follow Signal", "callback_data": instance.id}],
+            # [{"text": "Option 2", "callback_data": "option2_data"}],
+            [{"text": "Open Google", "url": "https://www.google.com"}],
+        ]
     }
     keyboard_json = json.dumps(keyboard)
 
-
     message = f"New trade signal created: Symbol - {instance.symbol} \n entryprice :{instance.price} \n stoploss :{instance.stop_amount} \n takeprofit :{instance.take_profit_amount}"
     for user in users_with_uuid:
-        data = {"chat_id": user.telegram_id, "text": message, "reply_markup": keyboard_json}
+        data = {
+            "chat_id": user.telegram_id,
+            "text": message,
+            "reply_markup": keyboard_json,
+        }
         requests.post(reply_url, data=data)
 
+
+@receiver(post_save, sender=TradeHistory)
+def create_telegram_msg(sender, instance, created, **kwargs):
+    if created:
+        reply_url = (
+            f"https://api.telegram.org/bot{settings.TELEGRAM_API_TOKEN}/sendMessage"
+        )
+        chat_id = instance.user.telegram_id
+        if chat_id:
+            reply = "your trade has been created"
+            data = {"chat_id": chat_id, "text": reply}
+            try:
+                requests.post(reply_url, data=data)
+            except:
+                pass
