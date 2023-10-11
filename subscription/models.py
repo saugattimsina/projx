@@ -7,6 +7,7 @@ class Subscription(models.Model):
     package_name = models.CharField(max_length=255)
     price = models.FloatField()
     time_in_days = models.CharField(max_length=5)
+    time_in_months = models.CharField(max_length=5,null=True,blank=True)
     description = RichTextField()
     package_type= models.CharField(choices=(("paid",'paid'),("free","free")),max_length=255,blank=True,null=True)
 
