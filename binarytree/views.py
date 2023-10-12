@@ -28,7 +28,7 @@ from user.models import User  # Import the User model
 
 # binary_members = MLMBinary.objects.all()
 # get_all_nodes_recursive(binary_members[0])
- 
+
 
 def get_all_nodes_bfs(root_node):
     nodes = []
@@ -84,10 +84,8 @@ def treeview(request):
     # car = {}
     # for users in binary_members:
     #     print(users['level'])
-        
-    return render(request, 'treeview.html')
 
-
+    return render(request, "treeview.html")
 
     # return render(request, "treeview.html")
 
@@ -122,11 +120,55 @@ def determinerank(user):
         return ranks.name
 
 
-def determine_rank_in_tree(request):
-    x = MLMMember.objects.get(name="symbol")
-    ancestors = x.get_ancestors()
-
+def weekly_fast_start_commissions(ancestors):
+    membership_amount = 40
+    level = len(ancestors)
     for ancestor in ancestors:
-        print(ancestor.user)
-        print(determinerank(ancestor.user))
+        user = ancestor.user
+        rank = UserRank.objects.get(user=user).rank.name
+        print("user :", user)
+        print("rank :", rank)
+        print("level :", level)
+        if level == 1:
+            print(f"commision 50%")
+        elif level == 2 and (
+            rank == "Bronze"
+            or rank == "Silver"
+            or rank == "Gold"
+            or rank == "Platinum"
+            or rank == "Diamond"
+        ):
+            print(f"commision 10%")
+        elif (level == 3 or level == 4) and (
+            rank == "Silver"
+            or rank == "Gold"
+            or rank == "Platinum"
+            or rank == "Diamond"
+        ):
+            print(f"commision 5%")
+        elif level == 5 and (rank == "Platinum" or rank == "Diamond" or rank == "Gold"):
+            print(f"commision {membership_amount*0.03}")
+        elif level == 6 and (rank == "Platinum" or rank == "Diamond" or rank == "Gold"):
+            print(f"commision {membership_amount*0.02}")
+        elif level == 7 and (rank == "Platinum" or rank == "Diamond"):
+            print(f"commision {membership_amount*0.02}")
+        elif level == 8 and (rank == "Platinum" or rank == "Diamond"):
+            print(f"commision {membership_amount*0.01}")
+        elif (level == 9 or level == 10) and rank == "Diamond":
+            print(f"commision {membership_amount*0.01}")
+        else:
+            print("no commisions")
+        level = level - 1
+
+
+def determine_rank_in_tree(request):
+    user = User.objects.get(id=31)
+    print(user)
+    x = MLMMember.objects.get(user=user)
+    ancestors = x.get_ancestors()
+    print(ancestors)
+    weekly_fast_start_commissions(ancestors)
+    # for ancestor in ancestors:
+    #     print(ancestor.user)
+    #     print(determinerank(ancestor.user))
     return HttpResponse("ok")
