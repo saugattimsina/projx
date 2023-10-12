@@ -17,10 +17,14 @@ from celery import shared_task
 @shared_task
 def get_trade_history():
     thirty_min_ago = timezone.now() - timedelta(minutes=30)
+    """
+    yaha issue aucca ki bichar garau
+    """
 
     trades_now = Portfolio.objects.filter(created_on__gte=thirty_min_ago)
     for user in trades_now:
         print(user.user)
+        
         user_key = UserKey.objects.get(user=user.user, is_active=True)
         symbol = user.symbol.symbol
         exchange = ccxt.binance(

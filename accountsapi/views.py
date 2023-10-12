@@ -42,7 +42,7 @@ class UserLoginApiView(GenericAPIView):
                     "success": True,
                     "data": {
                         "user_id": user.id,
-                        "username": user.username,
+                        # "username": user.username,
                     },
                     "message": "Login Successful. Proceed to 2FA",
                 },
@@ -72,12 +72,12 @@ class UserRegistrationApiView(GenericAPIView):
                     "message": "Registration Success. Proceed to 2FA",
                     "sucess": True,
                     "data": {
-                        "token": token.key,
+                        # "token": token.key,
                         "user": {
                             "user_id": user.id,
-                            "username": user.username,
-                            "image": user.image.path,
-                            "is_client": user.is_client,
+                            # "username": user.username,
+                            # "image": user.image.path if user.image else None,
+                            # "is_client": user.is_client,
                             "qr_code": user.qr_code.url,
                         },
                     },

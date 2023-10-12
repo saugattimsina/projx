@@ -13,7 +13,7 @@ from .views import (
 from .apiview import (
     OpenOrders,
     ShowBalance,
-    TradeHistory
+    TradeHistoryView
 )
 
 app_name = "signalbot"
@@ -29,7 +29,7 @@ urlpatterns = [
 
     # api view
     path("openorders/", OpenOrders.as_view(), name="openorders"),
-    path("tradehistory/", TradeHistory.as_view(), name="closedorders"),
+    path("tradehistory/", TradeHistoryView.as_view(), name="closedorders"),
     path("balance/", ShowBalance.as_view(), name="balance-show"),
 
 
