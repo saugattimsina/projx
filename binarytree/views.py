@@ -130,3 +130,24 @@ def determine_rank_in_tree(request):
         print(ancestor.user)
         print(determinerank(ancestor.user))
     return HttpResponse("ok")
+
+
+def create_parents_binary(user):
+    print(user)
+
+    binary_pos = MLMBinary.objects.filter(name=user)
+    if binary_pos.exists():
+        ancestors = binary_pos[0].get_ancestors()
+        print(ancestors)
+        
+    else:
+        return None
+
+
+def determineparents(request):
+    print("hello")
+    # print(request.user)
+    x = User.objects.get(username="abcd1")
+    create_parents_binary(x)
+
+    return HttpResponse("ok")

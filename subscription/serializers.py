@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Subscription,UserSubPaymentHistory
+from .models import Subscription,UserSubPaymentHistory,SubscriptionDetail
 
 
 from .payment_generate import get_payment_qr
@@ -57,3 +57,17 @@ class SubscriptionSerializer(serializers.Serializer):
             img = qr_generator(payment_qr)
 
             return {"mesage":"please pay to this qr code","image":img}
+
+
+class SubscriptionDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubscriptionDetail
+        # fields = '__all__'
+        exclude=('related_to',"id")
+
+class SubscriptionDataSerializer(serializers.ModelSerializer):
+    subscription_details = SubscriptionDetailSerializer(source = "subscriptiondetail_set",many=True)
+    class Meta:
+        model = Subscription
+        fields = ("package_name","price","time_in_days","time_in_months","description","package_type","subscription_details") 
+        # feilds = ('subscription_details',)

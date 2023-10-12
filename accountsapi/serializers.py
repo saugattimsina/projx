@@ -18,7 +18,7 @@ from django.core.files.base import ContentFile
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password, check_password
-
+from subscription.models import UserSubcription
 User = get_user_model()
 
 
@@ -78,20 +78,20 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = [
             "username",
             "name",
-            "image",
+            # "image",
             # "telegram_id",
             "email",
             "password",
             "confirm_password",
             "refered",
         ]
-        extra_kwargs = {"password": {"write_only": True}, "image": {"required": True}}
+        extra_kwargs = {"password": {"write_only": True}}
 
-    def validate_image(self, value):
-        # Check if the uploaded image is greater than 2 MB (2 * 1024 * 1024 bytes)
-        if value.size > 2 * 1024 * 1024:
-            raise serializers.ValidationError(_("Image size should not exceed 2 MB."))
-        return value
+    # def validate_image(self, value):
+    #     # Check if the uploaded image is greater than 2 MB (2 * 1024 * 1024 bytes)
+    #     if value.size > 2 * 1024 * 1024:
+    #         raise serializers.ValidationError(_("Image size should not exceed 2 MB."))
+    #     return value
 
     def validate_password(self, value):
         # Use Django's built-in password validation to check password strength
@@ -127,7 +127,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         # Create the user instance without custom fields
         user = User(username=validated_data["username"], email=validated_data["email"])
-        user.image = validated_data["image"]
+        # user.image = validated_data["image"]
         user.name = validated_data["name"]
         user.set_password(password)
         # user.telegram_id = validated_data["telegram_id"]
@@ -152,6 +152,7 @@ class VerifyOTPSerializer(serializers.Serializer):
 
         if attrs.get("otp") != user.login_otp or not user.is_valid_otp():
             totp = pyotp.TOTP(user.otp_base32).now()
+            print("otp",totp)
             user.login_otp = totp
             user.otp_created_at = datetime.now(timezone.utc)
             user.login_otp_used = False
@@ -169,13 +170,27 @@ class VerifyOTPSerializer(serializers.Serializer):
         token = Token.objects.get(user=user)
         user.login_otp_used = True
         user.save(update_fields=["login_otp_used"])
+        key = UserKey.objects.filter(user=user).exists()
+        subscription = UserSubcription.objects.filter(user=user)
+        if subscription.exists():
+            subscription = subscription.last()
+            sub = {}
+            # sub["subscription_id"] = subscription.id
+            sub["subscription_type"] = subscription.plan.package_name
+            # sub["subscription_start_date"] = subscription.start_date
+            sub['package_type'] = subscription.plan.package_type
+            sub["subscription_end_date"] = subscription.end_date
+        else:
+            sub = {}
         return {
             "token": token.key,
             "user": {
                 "user_id": user.id,
                 "username": user.username,
-                "image": user.image.path,
+                "image": user.image.path if user.image else None,
                 "is_client": user.is_client,
+                "key": key,
+                "package":sub 
             },
         }
 

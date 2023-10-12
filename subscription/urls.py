@@ -6,7 +6,8 @@ from .views import (
 )
 
 from .apiview import (
-    CreatePaymentView
+    CreatePaymentView,
+    SubscriptionListView,
 
 )
 
@@ -15,4 +16,5 @@ urlpatterns = [
 
     path("payment/", PaymentWebhook.as_view(), name="telegram_webhook"),
     path('create/payment/', CreatePaymentView.as_view(), name='create_payment'),
+    path("get-subscriptions-package/", SubscriptionListView.as_view(), name="get_sub"),
 ]

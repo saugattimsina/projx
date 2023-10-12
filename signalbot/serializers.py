@@ -3,10 +3,10 @@
 from rest_framework import serializers
 
 from datetime import datetime
-from .models import TradeSignals,SignalFollowedBy,TradeSymbol
+from .models import TradeSignals,SignalFollowedBy,TradeSymbol,TradeHistory,Portfolio
 from user.models import User,UserKey
 import ccxt
-
+from django.utils import timezone
 # def fetch_trade_history(api_key,api_secret,symbol,exchange):
 
 #     try:
@@ -88,3 +88,12 @@ class TradeHistorySerializer(serializers.Serializer):
         else:
             return {"data":[],"message":"no trade history found"}
         return {"data":history,"message":"trade history found"}
+    
+
+
+class TradesHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TradeHistory
+        fields = '__all__'
+
+    
