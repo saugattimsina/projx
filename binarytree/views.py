@@ -161,16 +161,42 @@ def weekly_fast_start_commissions(ancestors):
         level = level - 1
 
 
+from subscription.models import UserSubPaymentHistory, Subscription
+from datetime import datetime
+from .models import BinaryParents
+
+
 def determine_rank_in_tree(request):
-    user = User.objects.get(id=31)
-    print(user)
-    x = MLMMember.objects.get(user=user)
+    user = User.objects.get(id=103454)
+    # print(user)
+    x = MLMBinary.objects.get(name=user)
     ancestors = x.get_ancestors()
-    print(ancestors)
-    weekly_fast_start_commissions(ancestors)
+    # print(ancestors)
+    # y = MLMMember.objects.get(user=user)
+    # ancestor = y.get_ancestors()
+    # print(ancestor)
+    user.is_suscribed = True
+    user.save()
+    sub = Subscription.objects.get(id=2)
+    UserSubPaymentHistory.objects.create(
+        user=user,
+        subscription=sub,
+        date_transaction=datetime.now(),
+        amount=100,
+    )
+    # weekly_fast_start_commissions(ancestors)
     # for ancestor in ancestors:
-    #     print(ancestor.user)
-    #     print(determinerank(ancestor.user))
+    #     try:
+    #         binary_parent = BinaryParents.objects.get(user=user)
+    #     except:
+    #         binary_parent = BinaryParents.objects.create(user=user)
+    #     binary_parent.parents.add(ancestor)
+    #     binary_parent.save()
+    #     # print(determinerank(ancestor.user))
+    # binary_parent = BinaryParents.objects.get(user=user)
+    # print(binary_parent.parents.all())
+    # for parent in binary_parent.parents.all().order_by("-id")[:12]:
+    #     print(parent.name)
     return HttpResponse("ok")
 
 
@@ -181,7 +207,7 @@ def create_parents_binary(user):
     if binary_pos.exists():
         ancestors = binary_pos[0].get_ancestors()
         print(ancestors)
-        
+
     else:
         return None
 

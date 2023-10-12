@@ -2,8 +2,10 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 
 from user.models import User
-from .models import Subscription, UserSubcription
-from binarytree.models import MLMMember, MLMBinary
+from .models import Subscription, UserSubcription, UserSubPaymentHistory
+from binarytree.models import MLMMember, MLMBinary, BinaryParents
+from subscription.enroller_commision import calculate_commission
+from subscription.matrix_commision import calculate_matrix_commission
 
 # ,ForcedMatrix
 
@@ -152,3 +154,39 @@ def create_default_subscription(sender, instance, created, **kwargs):
                         """ need to add user in the right wing """
                 else:
                     print("oops something went wrong")
+
+
+@receiver(post_save, sender=UserSubPaymentHistory)
+def enrollment_commision(sender, instance, created, **kwargs):
+    if created:
+        print(1)
+        user = instance.user
+        if user.is_suscribed:
+            print(2)
+            no_sub_payment = UserSubPaymentHistory.objects.filter(user=user).count()
+            if no_sub_payment == 1:
+                print(3)
+                amount = instance.subscription.price
+                x = MLMMember.objects.get(user=user)
+                reffered_by = user.refered
+                refered_user = user
+                ancestors = x.get_ancestors()
+                calculate_commission(
+                    ancestors=ancestors,
+                    amount=amount,
+                    reffered_by=reffered_by,
+                    refered_user=refered_user,
+                )
+                x = MLMBinary.objects.get(name=user)
+                ancestors = x.get_ancestors()
+                for ancestor in ancestors:
+                    try:
+                        binary_parent = BinaryParents.objects.get(user=user)
+                    except:
+                        binary_parent = BinaryParents.objects.create(user=user)
+                    binary_parent.parents.add(ancestor)
+                    binary_parent.save()
+            elif no_sub_payment > 1:
+                print(4)
+                amount = instance.subscription.price
+                calculate_matrix_commission(user=user, amount=amount)
