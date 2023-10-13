@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import MLMMember, MLMBinary, MLMRank, UserRank
+from .models import MLMMember, MLMBinary, MLMRank, UserRank, BinaryParents
 
 # admin.site.register(MLMMember)
 
@@ -29,3 +29,4 @@ admin.site.register(MLMBinary, MyAdmin1)
 
 admin.site.register(MLMRank)
 admin.site.register(UserRank)
+admin.site.register(BinaryParents)

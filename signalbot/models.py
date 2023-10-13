@@ -61,7 +61,7 @@ class TradeHistory(models.Model):
 
 
 class ReferalWallet(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     amount = models.FloatField()
     created_on = models.DateTimeField(auto_now_add=True)
     # is_withdrawn = models.BooleanField(default=False)
@@ -88,7 +88,7 @@ class ReferalIncome(models.Model):
     )
     amount = models.FloatField()
     created_on = models.DateTimeField(auto_now_add=True)
-    is_withdrawn = models.BooleanField(default=False)
+    # is_withdrawn = models.BooleanField(default=False)
 
 
 class Binawallet(models.Model):

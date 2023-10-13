@@ -73,3 +73,8 @@ class UserRank(models.Model):
 
     def __str__(self):
         return f"{self.user.username} {self.rank.name}"
+
+
+class BinaryParents(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    parents = models.ManyToManyField(MLMBinary)
