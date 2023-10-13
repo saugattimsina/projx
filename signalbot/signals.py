@@ -34,7 +34,7 @@ def create_default_subscription(sender, instance, created, **kwargs):
     }
     keyboard_json = json.dumps(keyboard)
 
-    message = f"New trade signal created: Symbol - {instance.symbol} \n entryprice :{instance.price} \n stoploss :{instance.stop_amount} \n takeprofit :{instance.take_profit_amount}"
+    message = f"New trade signal created: Symbol - {instance.symbol} \n entryprice :{instance.price} \n stoploss :{instance.stop_amount}"
     for user in users_with_uuid:
         data = {
             "chat_id": user.telegram_id,

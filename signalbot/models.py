@@ -13,9 +13,11 @@ class TradeSymbol(models.Model):
     def __str__(self):
         return self.symbol
 
-class TakeProfits(models.Model):
-    amount = models.FloatField()
-    percentage = models.FloatField()
+
+# class TakeProfits(models.Model):
+#     amount = models.FloatField()
+#     percentage = models.FloatField()
+
 
 class TradeSignals(models.Model):
     symbol = models.ForeignKey(TradeSymbol, on_delete=models.CASCADE)
@@ -23,8 +25,18 @@ class TradeSignals(models.Model):
     price = models.FloatField()
     leverage = models.IntegerChoices
     stop_amount = models.FloatField()
-    trade_type = models.CharField(max_length=50, choices=(("Buy/Long", "Buy/Long"), ("Sell/Short", "Sell/Short")))
-    take_profit_amount = models.ManyToManyField(TakeProfits)
+    trade_type = models.CharField(
+        max_length=50, choices=(("Buy/Long", "Buy/Long"), ("Sell/Short", "Sell/Short"))
+    )
+    # take_profit_amount = models.ManyToManyField(TakeProfits)
+    amount_1 = models.FloatField(default=0)
+    percentage_1 = models.FloatField(default=0)
+    amount_2 = models.FloatField(null=True, blank=True)
+    percentage_2 = models.FloatField(null=True, blank=True)
+    amount_3 = models.FloatField(null=True, blank=True)
+    percentage_3 = models.FloatField(null=True, blank=True)
+    amount_4 = models.FloatField(null=True, blank=True)
+    percentage_4 = models.FloatField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
 
 
