@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "django_crontab",
     "wallet",
     "binarytreeapi",
+    "corsheaders",
 ]
 if DEBUG:
     # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -70,6 +71,7 @@ MIDDLEWARE = [
     # "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -81,6 +83,8 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 ROOT_URLCONF = "projx.urls"
+CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ALLOWED_ORIGINS = ["*"]
 
 TEMPLATES = [
     {

@@ -4,8 +4,26 @@
 <form method="post" style="padding-top: 5rem; padding-left:4rem;">
     {% csrf_token %}
     {{ form.as_p }}
-    
+    <hr>
+    <h1>
+        Set Profit
+    </h1>
+    <div id="profit">
+        {{ form2.as_p }}
+    </div>
+    <input type="button" value="takeprofit add" onclick="create_div()">
     <input type="submit" value="Create" />
 </form>
+{% block javascript %}
 
+<script>
+    var form_content = `{{ form2.as_p }}`;
+    function create_div(){
+        var x = document.getElementById("profit").innerHTML;
+       
+        x +=`<hr>`+form_content;
+        document.getElementById("profit").innerHTML = x;
+    }
+</script>
+{% endblock javascript %}
 {% endblock content %}

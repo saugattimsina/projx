@@ -13,14 +13,18 @@ class TradeSymbol(models.Model):
     def __str__(self):
         return self.symbol
 
+class TakeProfits(models.Model):
+    amount = models.FloatField()
+    percentage = models.FloatField()
 
 class TradeSignals(models.Model):
     symbol = models.ForeignKey(TradeSymbol, on_delete=models.CASCADE)
     # trade_side = models.CharField(max_length=255)
     price = models.FloatField()
-    # leverage = models.FloatField()
+    leverage = models.IntegerChoices
     stop_amount = models.FloatField()
-    take_profit_amount = models.FloatField()
+    trade_type = models.CharField(max_length=50, choices=(("Buy/Long", "Buy/Long"), ("Sell/Short", "Sell/Short")))
+    take_profit_amount = models.ManyToManyField(TakeProfits)
     created_on = models.DateTimeField(auto_now_add=True)
 
 

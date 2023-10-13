@@ -50,6 +50,7 @@ class UserLoginSerializer(serializers.Serializer):
             password=attrs.get("password"),
         )
         print(user)
+        
         if user is None:
             raise exceptions.AuthenticationFailed("Invalid login details.")
         else:
