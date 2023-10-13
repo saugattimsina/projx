@@ -4,7 +4,7 @@ from django.shortcuts import render,redirect
 import queue
 
 from .models import TradeSignals,SignalFollowedBy,TradeSymbol
-from .forms import TradeSignalsForm
+from .forms import TradeSignalsForm,TakeProfitForm,TakeProfits
 from django.views.generic import CreateView,ListView
 from django.urls import reverse_lazy
 
@@ -17,15 +17,44 @@ from rest_framework import status
 from django.db.models import Count
 import ccxt
 from jsonview.decorators import json_view
+# from django.forms import formset_factory 
+from django.forms import modelformset_factory
 
+
+from django.http import HttpResponse
 class TradeCreateView(CreateView):
     model = TradeSignals
     form_class = TradeSignalsForm
+    
+    # take_profit = TakeProfitForm
     # print("form is",form_class)
     template_name = 'signalbot/trade_create.html'
     success_url = '/'
-    # success_url = r)
-    # return render(request, 'signalbot/trade_create.html', {'form': form_class})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['take_profit'] = TakeProfitForm()
+        TakeProfitFormSet = modelformset_factory(TakeProfits, form=TakeProfitForm, extra=4)
+        context['form2'] = TakeProfitFormSet
+        return context
+    def post(self,request):
+        TakeProfitFormSet = modelformset_factory(TakeProfits, form=TakeProfitForm)
+        formset = TakeProfitFormSet(request.POST, queryset=TakeProfits.objects.none())
+        formset.empty_permitted = True
+        form = TradeSignalsForm(request.POST)
+        x = form.save(commit=False)
+        print("the id is ",x.id)
+        # print(formset)
+        if formset.is_valid() and form.is_valid():
+            # print(form)
+            print("hello")
+            # for take_profit in formset:
+            #     y = take_profit.save()
+            #     form.instance.take_profit_amount.add(y)
+            # form.save()    
+        else:
+            print("invalid")
+        return HttpResponse("success")
 
 class TelegramWebhook(APIView):
     def post(self, request, token):
@@ -87,7 +116,8 @@ def all_symbols():
         pair = info.get("pair",info.get("symbol"))
         base_asset = info.get("baseAsset")
         quote_asset = info.get("quoteAsset")
-        TradeSymbol.objects.get_or_create(symbol=pair,base_asset=base_asset,quote_asset=quote_asset)
+        if quote_asset == "USDT":
+            TradeSymbol.objects.get_or_create(symbol=pair,base_asset=base_asset,quote_asset=quote_asset)
 
     return "true"
 class ShowPairs(ListView):

@@ -52,8 +52,8 @@ class MLMBinary(MP_Node):
 
     # Other fields to represent relevant information about the MLM member
 
-    def __str__(self):
-        return self.name.username
+    # def __str__(self):
+    #     return self.name.username
 
 
 class MLMRank(models.Model):

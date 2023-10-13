@@ -37,17 +37,35 @@ class UserLoginApiView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         if user is not None:
-            return Response(
-                {
-                    "success": True,
-                    "data": {
-                        "user_id": user.id,
-                        # "username": user.username,
+            if user.is_connected_to_authunticator:
+                return Response(
+                    {
+                        "success": True,
+                        "data": {
+                            "user_id": user.id,
+                            # "username": user.username,
+                        },
+                        "message": "Login Successful. Proceed to 2FA",
                     },
-                    "message": "Login Successful. Proceed to 2FA",
-                },
-                status=200,
-            )
+                    status=200,
+                )
+            else:
+                return Response(
+                    {
+                        "success": True,
+                        "data": {
+                        "user": {
+                            "user_id": user.id,
+                            # "username": user.username,
+                            # "image": user.image.path if user.image else None,
+                            # "is_client": user.is_client,
+                            "qr_code": user.qr_code.url,
+                        },
+                        }
+                    },
+                    status=200,
+
+                )
         else:
             return Response(
                 {
@@ -101,6 +119,9 @@ class VerityOTPView(GenericAPIView):
         if serializer.is_valid():
             user_id = serializer.validated_data["user_id"]
             user = User.objects.filter(id=user_id).first()
+            if not user.is_connected_to_authunticator:
+                user.is_connected_to_authunticator = True
+                user.save()
             login_info: dict = serializer.save()
             return Response(
                 {
