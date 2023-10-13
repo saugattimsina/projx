@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "treebeard",
     "django_crontab",
     "wallet",
+    "binarytreeapi",
 ]
 if DEBUG:
     # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

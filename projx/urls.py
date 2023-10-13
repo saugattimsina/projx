@@ -78,6 +78,7 @@ urlpatterns = [
     # path('telegram/', django_telethon_urls()),
     # api
     path("api/account/", include("accountsapi.urls")),
+    path("api/binary/", include("binarytreeapi.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
