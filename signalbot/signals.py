@@ -3,12 +3,12 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
 import requests
-from user.models import User
+from user.models import User,UserKey
 from celery import shared_task
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
 import json
-
+from .trade_set import create_my_trade
 # import tracemalloc
 # tracemalloc.start()
 # # from telegram1 import send_telegram_message
@@ -23,9 +23,9 @@ reply_url = f"https://api.telegram.org/bot{settings.TELEGRAM_API_TOKEN}/sendMess
 def create_default_subscription(sender, instance, created, **kwargs):
     print(instance)
     # if created:
-    users_with_uuid = User.objects.filter(user_uuid__isnull=False)
+    users_with_uuid = User.objects.filter(is_client=False)
 
-    keyboard = {
+    keyboard = { 
         "inline_keyboard": [
             [{"text": "Follow Signal", "callback_data": instance.id}],
             # [{"text": "Option 2", "callback_data": "option2_data"}],
@@ -35,12 +35,30 @@ def create_default_subscription(sender, instance, created, **kwargs):
     keyboard_json = json.dumps(keyboard)
 
     message = f"New trade signal created: Symbol - {instance.symbol} \n entryprice :{instance.price} \n stoploss :{instance.stop_amount}"
+    print("user with uuid",users_with_uuid)
     for user in users_with_uuid:
-        data = {
-            "chat_id": user.telegram_id,
-            "text": message,
-            "reply_markup": keyboard_json,
-        }
+        if user.auto_set_trade:
+            print("auto set trade",user)
+            
+            user_key = UserKey.objects.filter(user=user)
+            print(user_key)
+            if user_key:
+                print("thau ma aayo")
+                create_my_trade(instance,user,user_key[0])
+            else:
+                data = {
+                    "chat_id": user.telegram_id,
+                    "text": "please Setup Your Binance Future Api Key",
+                }
+
+        elif user.telegram_id:
+            data = {
+                "chat_id": user.telegram_id,
+                "text": message,
+                "reply_markup": keyboard_json,
+            }
+        else:
+            continue
         requests.post(reply_url, data=data)
 
 

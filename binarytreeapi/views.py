@@ -32,10 +32,12 @@ class GetMYParentandChildren(APIView):
         user = self.request.user
         x = MLMMember.objects.get(user=user)
         y = MLMBinary.objects.get(name=user)
+        
         descendants_binary = get_descendants_up_to_2_levels(y)
         enrollment_tree_user = []
         for user in x.get_children():
-            enrollment_tree_user.append({"username": user.user})
+            # print(user.user)
+            enrollment_tree_user.append({"username": user.user.username if user.user else "Account Expired"})
         return Response(
             {
                 "message": "fetched tree of user",

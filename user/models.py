@@ -42,6 +42,7 @@ class User(AbstractUser):
     otp_created_at = models.DateTimeField(blank=True, null=True)
     is_first_month = models.BooleanField(default=True)
     is_connected_to_authunticator = models.BooleanField(default=False)
+    auto_set_trade = models.BooleanField(default=False)
 
     def is_valid_otp(self):
         lifespan_in_seconds = 40
