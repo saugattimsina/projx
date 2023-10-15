@@ -72,7 +72,7 @@ class UserRank(models.Model):
     rank = models.ForeignKey(MLMRank, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.username} {self.rank.name}"
+        return f"{self.user} {self.rank}"
 
 
 class BinaryParents(models.Model):

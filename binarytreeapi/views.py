@@ -7,10 +7,10 @@ from rest_framework import status
 
 
 # Create your views here.
-def get_descendants_up_to_2_levels(node):
+def get_descendants_up_to_2_levels(node, root):
     descendants = []
-    binarytree = {}
     for child in node.get_children():
+        binarytree = {}  # Create a new dictionary for each child
         binarytree["level"] = 1
         binarytree["user"] = child.name.username
         children = []
@@ -32,10 +32,10 @@ class GetMYParentandChildren(APIView):
         user = self.request.user
         x = MLMMember.objects.get(user=user)
         y = MLMBinary.objects.get(name=user)
-        descendants_binary = get_descendants_up_to_2_levels(y)
+        descendants_binary = get_descendants_up_to_2_levels(y, user)
         enrollment_tree_user = []
-        for user in x.get_children():
-            enrollment_tree_user.append({"username": user.user})
+        for users in x.get_children():
+            enrollment_tree_user.append({"username": users.user.username})
         return Response(
             {
                 "message": "fetched tree of user",
