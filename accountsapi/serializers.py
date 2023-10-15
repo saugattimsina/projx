@@ -19,6 +19,8 @@ from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password, check_password
 from subscription.models import UserSubcription
+from binarytree.models import MLMRank, UserRank
+
 User = get_user_model()
 
 
@@ -50,7 +52,7 @@ class UserLoginSerializer(serializers.Serializer):
             password=attrs.get("password"),
         )
         print(user)
-        
+
         if user is None:
             raise exceptions.AuthenticationFailed("Invalid login details.")
         else:
@@ -153,7 +155,7 @@ class VerifyOTPSerializer(serializers.Serializer):
 
         if attrs.get("otp") != user.login_otp or not user.is_valid_otp():
             totp = pyotp.TOTP(user.otp_base32).now()
-            print("otp",totp)
+            print("otp", totp)
             user.login_otp = totp
             user.otp_created_at = datetime.now(timezone.utc)
             user.login_otp_used = False
@@ -179,10 +181,12 @@ class VerifyOTPSerializer(serializers.Serializer):
             # sub["subscription_id"] = subscription.id
             sub["subscription_type"] = subscription.plan.package_name
             # sub["subscription_start_date"] = subscription.start_date
-            sub['package_type'] = subscription.plan.package_type
+            sub["package_type"] = subscription.plan.package_type
             sub["subscription_end_date"] = subscription.end_date
         else:
             sub = {}
+        rank = UserRank.objects.get(user=user)
+        user_rank = rank.rank.name
         return {
             "token": token.key,
             "user": {
@@ -191,7 +195,8 @@ class VerifyOTPSerializer(serializers.Serializer):
                 "image": user.image.path if user.image else None,
                 "is_client": user.is_client,
                 "key": key,
-                "package":sub 
+                "user_rank": user_rank,
+                "package": sub,
             },
         }
 

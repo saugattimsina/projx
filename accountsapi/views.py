@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -36,6 +38,9 @@ class UserLoginApiView(GenericAPIView):
         )
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        token = Token.objects.get(user=user)
+        token.delete()
+        token = Token.objects.create(user=token.user)
         if user is not None:
             if user.is_connected_to_authunticator:
                 return Response(
@@ -54,17 +59,16 @@ class UserLoginApiView(GenericAPIView):
                     {
                         "success": True,
                         "data": {
-                        "user": {
-                            "user_id": user.id,
-                            # "username": user.username,
-                            # "image": user.image.path if user.image else None,
-                            # "is_client": user.is_client,
-                            "qr_code": user.qr_code.url,
+                            "user": {
+                                "user_id": user.id,
+                                # "username": user.username,
+                                # "image": user.image.path if user.image else None,
+                                # "is_client": user.is_client,
+                                "qr_code": user.qr_code.url,
+                            },
                         },
-                        }
                     },
                     status=200,
-
                 )
         else:
             return Response(
@@ -184,3 +188,20 @@ class ApiForUserBinanceKey(ModelViewSet):
                 {"message": serializer.errors, "success": False},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class LogoutApiView(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    @swagger_auto_schema(
+        operation_summary="Api for logging user out and expire user token"
+    )
+    def post(self, request):
+        user = self.request.user
+        token = Token.objects.get(user=user)
+        token.delete()
+        token = Token.objects.create(user=token.user)
+        return Response(
+            {"message": "Logout success", "success": True},
+            status=status.HTTP_200_OK,
+        )

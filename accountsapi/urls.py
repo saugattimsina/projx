@@ -5,12 +5,14 @@ from .views import (
     UserRegistrationApiView,
     VerityOTPView,
     ApiForUserBinanceKey,
+    LogoutApiView,
 )
 
 
 urlpatterns = [
     # user Api
     path("login/", UserLoginApiView.as_view()),
+    path("logout/", LogoutApiView.as_view()),
     path("registrations/", UserRegistrationApiView.as_view()),
     path("verify/otp/", VerityOTPView.as_view()),
     path("add/key/", ApiForUserBinanceKey.as_view({"post": "create"})),

@@ -1,53 +1,128 @@
 from django.shortcuts import render
-from binarytree.models import MLMBinary, MLMMember
+from binarytree.models import MLMBinary, MLMMember, UserRank, MLMRank
 from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework import status
+from user.models import User
+from subscription.models import UserSubcription
 
 
 # Create your views here.
-def get_descendants_up_to_2_levels(node):
+def get_descendants_up_to_2_levels(node, parent):
     descendants = []
+
+    binarytree = {}  # Create a dictionary for the parent
+    binarytree["parent"] = parent
+    binarytree["left_children"] = []
+    binarytree["right_children"] = []
+    count = 0
+    inner_count = 0
     for child in node.get_children():
-        binarytree = {}  # Create a new dictionary for each child
-        binarytree["level"] = 1
-        binarytree["user"] = child.name.username
-        children = []
+        child_data = {
+            "level": 1,
+            "user": child.name.username,
+            "left_children": [],
+            "right_children": [],
+        }
+
         for sub_child in child.get_children():
-            child_data = {
-                "level": 2,
-                "user": sub_child.name.username,
-            }
-            children.append(child_data)
-        binarytree["children"] = children
-        descendants.append(binarytree)
+            sub_child_data = {"level": 2, "user": sub_child.name.username}
+            if inner_count == 0:
+                child_data["left_children"].append(sub_child_data)
+                inner_count = inner_count + 1
+            else:
+                child_data["right_children"].append(sub_child_data)
+                inner_count = 0
+
+        if count == 0:
+            binarytree["left_children"].append(child_data)
+            count = count + 1
+        else:
+            binarytree["right_children"].append(child_data)
+            count = 0
+
+    descendants.append(binarytree)
     return descendants
 
 
 class GetMYParentandChildren(APIView):
     authentication_classes = [TokenAuthentication]
 
-    def get(self, request):
-        user = self.request.user
-        x = MLMMember.objects.get(user=user)
-        y = MLMBinary.objects.get(name=user)
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            try:
+                mlm_user = MLMBinary.objects.get(name=user)
+                x = mlm_user.get_parent()
+                parent = x.name.username
+                binary_tree = get_descendants_up_to_2_levels(x, parent)
+                enrollment_tree_user = []
+                y = MLMMember.objects.get(user=user)
+                for users in y.get_children():
+                    user_sub = UserSubcription.objects.filter(user=users.user).first()
+                    if user_sub.plan.package_type == "free":
+                        date = "unknown"
+                    else:
+                        date = user_sub.end_date
+                    enrollment_tree_user.append(
+                        {"username": users.user.username, "expire_date": date}
+                    )
+                return Response(
+                    {
+                        "message": "fetched tree of user",
+                        "data": {
+                            "binary_tree": binary_tree,
+                            "enrollment_tree": enrollment_tree_user,
+                        },
+                        "success": True,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            except MLMBinary.DoesNotExist:
+                return Response(
+                    {"error": "User not found", "success": False}, status=404
+                )
+        except User.DoesNotExist:
+            return Response({"error": "User not found", "success": False}, status=404)
 
-        descendants_binary = get_descendants_up_to_2_levels(y)
-        enrollment_tree_user = []
-        for users in x.get_children():
-            # print(user.user)
-            enrollment_tree_user.append(
-                {"username": user.user.username if user.user else "Account Expired"}
+
+class GetUserRankApiView(APIView):
+    # authentication_classes = [TokenAuthentication]
+
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            user_rank = UserRank.objects.get(user=user)
+            next_rank = (
+                MLMRank.objects.filter(min_referrals__gt=user_rank.rank.min_referrals)
+                .order_by("min_referrals")
+                .first()
             )
-        return Response(
-            {
-                "message": "fetched tree of user",
-                "data": {
-                    "binary_tree": descendants_binary,
-                    "enrollment_tree": enrollment_tree_user,
+            print(next_rank)
+            x = MLMMember.objects.get(user=user)
+            referrals = x.get_children_count()
+            team_size = x.get_descendant_count()
+            required_refferals = 0
+            required_team_size = 0
+            if referrals < next_rank.min_referrals:
+                required_refferals = next_rank.min_referrals - referrals
+            elif team_size < next_rank.min_team_size:
+                required_team_size = next_rank.min_team_size - team_size
+            return Response(
+                {
+                    "message": "User rank and requirement for next rank fetched successfully",
+                    "data": {
+                        "user_rank": user_rank.rank.name,
+                        "next_rank": next_rank.name,
+                        "condition_for_next_rank": {
+                            "required_refferals": required_refferals,
+                            "required_team_size": required_team_size,
+                        },
+                    },
+                    "success": True,
                 },
-                "success": True,
-            },
-            status=status.HTTP_200_OK,
-        )
+                status=status.HTTP_200_OK,
+            )
+        except User.DoesNotExist:
+            return Response({"error": "User not found", "success": False}, status=404)
