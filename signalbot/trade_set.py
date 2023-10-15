@@ -32,18 +32,25 @@ def get_market_price_status(symbol):
 
 def create_my_trade(signal_obj,user,userkey):
     
-    symbol = signal_obj.symbol
-    price_now = get_market_price_status()
+    print(signal_obj.symbol.symbol)
+    symbol = signal_obj.symbol.symbol
+    price_now = get_market_price_status(symbol)
 
     price = signal_obj.price
     stop_price = signal_obj.stop_amount
-    profit_price = signal_obj.take_profit_amount
+    # profit_price = signal_obj.take_profit_amount
+
+
+    if signal_obj.trade_type == "Buy/Long":
+        trade_side = "buy"
+    else:
+        trade_side = "sell"
 
     """the trade could not be set in this condition"""
-    if not price_now > stop_price:
-        print(price_now,stop_price)
-        print("price is not good")
-        return False
+    # if not price_now > stop_price:
+    #     print(price_now,stop_price)
+    #     print("price is not good")
+    #     return False
 
 
     exchange1 = ccxt.binance(
@@ -60,7 +67,21 @@ def create_my_trade(signal_obj,user,userkey):
     follower = SignalFollowedBy.objects.create(user=user,signal=signal_obj)
     # try:
     # help(exchange.create_order)
-    
+    user_balance = 0
+    try:
+        balance = exchange.fetchBalance()
+        for currency,info in balance.items():
+            if currency == "USDT":
+                user_balance = info['free']
+                break
+    except Exception as e:
+        return "api key is not valid"
+    if user_balance < 20:
+        return "in sufficient balance"
+    balance_usable = user_balance * 0.9
+    quantity = abs(balance_usable / price_now)
+
+
     try:
         create_order = exchange1.create_order(
                 symbol=symbol,
@@ -75,7 +96,8 @@ def create_my_trade(signal_obj,user,userkey):
         follower.is_cancelled = True
         follower.save()
         return "order could not be placed"
-    inverted_side = 'sell'
+    inverted_side = "sell" if trade_side == "buy" else "buy"
+
     try:
         stopLossParams = {'stopPrice': stop_price}
         stopLossOrder = exchange.create_order(symbol, 'STOP_MARKET', inverted_side, quantity, price, stopLossParams)
@@ -87,19 +109,40 @@ def create_my_trade(signal_obj,user,userkey):
         '''need to cancel create orser if exixts'''
         exchange.cancel_order(create_order['id'], symbol=symbol)
         return "stop loss could not be placed"
-    takeProfitParams = {'stopPrice': profit_price}
-    try:
-        takeProfitOrder = exchange.create_order(symbol, 'TAKE_PROFIT_MARKET', inverted_side, quantity, price, takeProfitParams)
-        print(takeProfitOrder)
-    except Exception as e:
-        print(e)
-        '''need to cancel create orser if exixts'''
-        exchange.cancel_order(create_order['id'], symbol=symbol)
-        exchange.cancel_order(stopLossOrder['id'], symbol=symbol)
-        follower.is_cancelled = True
-        follower.save()
-        return "take profit could not be placed"
-    Portfolio.objects.create(user=user,symbol=symbol,quantity=quantity,entry_price=price,stop_price=stop_price,take_profit_price=profit_price)
+    for i in range(4):
+            # total_profits= 0
+        if signal_obj.amount_1 and signal_obj.percentage_1 and i == 0:
+            amount = signal_obj.amount_1
+            percentage = signal_obj.percentage_1
+        elif signal_obj.amount_2 and signal_obj.percentage_2 and i == 1:
+            amount = signal_obj.amount_2
+            percentage = signal_obj.percentage_2
+        elif signal_obj.amount_3 and signal_obj.percentage_3 and i == 2:
+            amount = signal_obj.amount_3
+            percentage = signal_obj.percentage_3
+        elif signal_obj.amount_4 and signal_obj.percentage_4 and i == 3:
+            amount = signal_obj.amount_4
+            percentage = signal_obj.percentage_4
+        else:
+            continue
+
+        """ here check the ampunt and amound has to be equal to quantiti """
+        # takeProfitParams = {'stopPrice': signal_obj.amount}
+        # quantity_new = abs(amount / price_now)
+        try:
+            takeProfitOrder = exchange.create_order(symbol, 'TAKE_PROFIT_MARKET', inverted_side, quantity, price, takeProfitParams)
+            print(takeProfitOrder)
+        except Exception as e:
+            print(e)
+            '''need to cancel create orser if exixts'''
+            exchange.cancel_order(create_order['id'], symbol=symbol)
+            exchange.cancel_order(stopLossOrder['id'], symbol=symbol)
+            follower.is_cancelled = True
+            follower.save()
+            return "take profit could not be placed"
+    
+    # yo part milaina baki
+    # Portfolio.objects.create(user=user,symbol=symbol,quantity=quantity,entry_price=price,stop_price=stop_price,take_profit_price=profit_price)
     exchange.close()
 
 
