@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from user.models import UserKey
 from accountsapi.utils import generate_otp, send_otp_email
@@ -21,6 +22,7 @@ from .serializers import (
     RegistrationSerializer,
     VerifyOTPSerializer,
     UserBinancyAPIKey,
+    ChangePasswordSerializer,
 )
 
 User = get_user_model()
@@ -209,6 +211,11 @@ class LogoutApiView(APIView):
 
 
 class SendOTPForPasswordForget(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    @swagger_auto_schema(
+        operation_summary="Api for sending otp to email for password forget"
+    )
     def get(self, request, user_id):
         try:
             user = User.objects.get(id=user_id)
@@ -226,12 +233,25 @@ class SendOTPForPasswordForget(APIView):
 
 
 class ValidateEmailOTP(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "otp": openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                ),
+            },
+        ),
+        operation_summary="Api for validating email otp",
+    )
     def post(self, request, user_id):
         otp = request.data.get("otp")
         try:
             user = User.objects.get(id=user_id)
-            if user.otp == otp:
-                user.otp = None  # Reset the OTP field after successful validation
+            if user.email_otp == otp:
+                user.email_otp = None  # Reset the OTP field after successful validation
                 user.save()
                 return Response(
                     {"message": "Invalid OTP.", "success": False},
@@ -242,5 +262,59 @@ class ValidateEmailOTP(APIView):
                     {"message": "Procced to password change", "success": True},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+        except User.DoesNotExist:
+            return Response({"message": "User not found", "success": False}, status=404)
+
+
+class ResetPasswordAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "new_password": openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                ),
+            },
+        ),
+        operation_summary="Api for Changing password",
+    )
+    def post(self, request, user_id):
+        new_password = request.data.get("new_password")
+        try:
+            user = User.objects.get(id=user_id)
+            user.set_password(new_password)
+            user.save()
+            return Response(
+                {"message": "Password changed successfully", "success": True},
+                status=status.HTTP_200_OK,
+            )
+        except User.DoesNotExist:
+            return Response({"message": "User not found", "success": False}, status=404)
+
+
+class ChangeUserPasswordAPIView(GenericAPIView):
+    serializer_class = ChangePasswordSerializer
+    authentication_classes = [TokenAuthentication]
+
+    @swagger_auto_schema(operation_summary="Api for updating user password")
+    def post(self, request, user_id):
+        serializer = ChangePasswordSerializer(data=request.data)
+        try:
+            user = User.objects.get(id=user_id)
+            if serializer.is_valid():
+                if user.check_password(serializer.data.get("old_password")):
+                    user.set_password(serializer.data.get("new_password"))
+                    user.save()
+                    return Response(
+                        {"message": "Password changed successfully."},
+                        status=status.HTTP_200_OK,
+                    )
+                return Response(
+                    {"error": "Incorrect old password."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({"message": "User not found", "success": False}, status=404)

@@ -204,8 +204,8 @@ CRONJOBS = [
 
 # Email Backend Configuration
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "uchihaobito9814@gmail.com"
+EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "obito uchiha"
-EMAIL_HOST_PASSWORD = "2000aug17"
+EMAIL_HOST_USER = "uchihaobito9814@gmail.com"
+EMAIL_HOST_PASSWORD = "znne ylda urqg ishq"

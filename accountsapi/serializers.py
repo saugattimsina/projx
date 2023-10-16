@@ -205,3 +205,8 @@ class UserBinancyAPIKey(serializers.ModelSerializer):
     class Meta:
         model = UserKey
         fields = ["api_key", "api_secret"]
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
