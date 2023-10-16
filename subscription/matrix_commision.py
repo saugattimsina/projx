@@ -5,9 +5,9 @@ from datetime import date
 
 
 def calculate_matrix_commission(user, amount):
-    rank = UserRank.objects.get(user=user).rank.name
+    rank = UserRank.objects.get(user=user).rank.equivalent_name
     binary_parent = BinaryParents.objects.get(user=user)
-    if rank == "Distributor":
+    if rank == "Unranked":
         for parent in binary_parent.parents.all().order_by("-id")[:12]:
             wallet = Binawallet.objects.filter(user=parent.name).first()
             if not wallet:

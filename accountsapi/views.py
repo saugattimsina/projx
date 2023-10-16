@@ -13,6 +13,7 @@ from rest_framework.authentication import TokenAuthentication
 from drf_yasg.utils import swagger_auto_schema
 
 from user.models import UserKey
+from accountsapi.utils import generate_otp, send_otp_email
 
 from .serializers import (
     UserLoginSerializer,
@@ -205,3 +206,41 @@ class LogoutApiView(APIView):
             {"message": "Logout success", "success": True},
             status=status.HTTP_200_OK,
         )
+
+
+class SendOTPForPasswordForget(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            otp = generate_otp()
+            user.email_otp = otp
+            user.save()
+            email = user.email
+            send_otp_email(email, otp)
+            return Response(
+                {"message": "OTP has been sent to your email", "success": True},
+                status=status.HTTP_200_OK,
+            )
+        except User.DoesNotExist:
+            return Response({"message": "User not found", "success": False}, status=404)
+
+
+class ValidateEmailOTP(APIView):
+    def post(self, request, user_id):
+        otp = request.data.get("otp")
+        try:
+            user = User.objects.get(id=user_id)
+            if user.otp == otp:
+                user.otp = None  # Reset the OTP field after successful validation
+                user.save()
+                return Response(
+                    {"message": "Invalid OTP.", "success": False},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            else:
+                return Response(
+                    {"message": "Procced to password change", "success": True},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except User.DoesNotExist:
+            return Response({"message": "User not found", "success": False}, status=404)

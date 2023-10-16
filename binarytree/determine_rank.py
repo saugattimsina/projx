@@ -23,6 +23,11 @@ def determinerank(ancestors):
                 min_team_size__lte=team_size,
                 max_team_size__gte=team_size,
             ).first()
+            # Check if rank_by_referrals is None, and if so, handle this case.
+            if rank_by_referrals is None:
+                print("Rank by referrals is None. Handle this case.")
+                continue  # Skip this user
+
             # If the user's referrals and team size match the same rank, return that rank.
             if rank_by_referrals == rank_by_team_size:
                 print(rank_by_referrals)

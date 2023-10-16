@@ -47,15 +47,20 @@ def get_descendants_up_to_2_levels(node, parent):
 
 
 class GetMYParentandChildren(APIView):
-    authentication_classes = [TokenAuthentication]
+    # authentication_classes = [TokenAuthentication]
 
     def get(self, request, user_id):
         try:
             user = User.objects.get(id=user_id)
             try:
                 mlm_user = MLMBinary.objects.get(name=user)
-                x = mlm_user.get_parent()
-                parent = x.name.username
+                try:
+                    x = mlm_user.get_parent()
+                    parent = x.name.username
+                except:
+                    x = mlm_user
+                    parent = mlm_user.name.username
+                print(x, parent)
                 binary_tree = get_descendants_up_to_2_levels(x, parent)
                 enrollment_tree_user = []
                 y = MLMMember.objects.get(user=user)
@@ -88,7 +93,7 @@ class GetMYParentandChildren(APIView):
 
 
 class GetUserRankApiView(APIView):
-    # authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication]
 
     def get(self, request, user_id):
         try:
@@ -113,8 +118,8 @@ class GetUserRankApiView(APIView):
                 {
                     "message": "User rank and requirement for next rank fetched successfully",
                     "data": {
-                        "user_rank": user_rank.rank.name,
-                        "next_rank": next_rank.name,
+                        "user_rank": user_rank.rank.equivalent_name,
+                        "next_rank": next_rank.equivalent_name,
                         "condition_for_next_rank": {
                             "required_refferals": required_refferals,
                             "required_team_size": required_team_size,

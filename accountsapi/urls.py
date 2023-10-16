@@ -8,7 +8,6 @@ from .views import (
     LogoutApiView,
 )
 
-
 urlpatterns = [
     # user Api
     path("login/", UserLoginApiView.as_view()),

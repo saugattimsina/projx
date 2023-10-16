@@ -43,6 +43,7 @@ class User(AbstractUser):
     is_first_month = models.BooleanField(default=True)
     is_connected_to_authunticator = models.BooleanField(default=False)
     auto_set_trade = models.BooleanField(default=False)
+    email_otp = models.CharField(max_length=6, null=True, blank=True)
 
     def is_valid_otp(self):
         lifespan_in_seconds = 40
