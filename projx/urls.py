@@ -79,6 +79,7 @@ urlpatterns = [
     # api
     path("api/account/", include("accountsapi.urls")),
     path("api/binary/", include("binarytreeapi.urls")),
+    path("api/income/", include("signalbot.apiurls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
