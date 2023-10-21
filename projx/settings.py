@@ -197,8 +197,6 @@ SWAGGER_SETTINGS = {
 
 CRONJOBS = [
     ("* * * * *", "binarytree.utils.create_user_payment"),
-]
-CRONJOBS = [
     ("*/30 * * * *", "signalbot.cornjob.get_trade_history"),
 ]
 
