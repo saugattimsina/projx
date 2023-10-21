@@ -44,7 +44,8 @@ def create_default_subscription(sender, instance, created, **kwargs):
             print(user_key)
             if user_key:
                 print("thau ma aayo")
-                create_my_trade(instance,user,user_key[0])
+                x = create_my_trade(instance,user,user_key[0])
+                print(x)
             else:
                 data = {
                     "chat_id": user.telegram_id,
@@ -59,7 +60,9 @@ def create_default_subscription(sender, instance, created, **kwargs):
             }
         else:
             continue
-        requests.post(reply_url, data=data)
+
+        # telegram ma exin manpathaula
+        # requests.post(reply_url, data=data)
 
 
 @receiver(post_save, sender=TradeHistory)
