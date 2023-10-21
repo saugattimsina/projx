@@ -12,14 +12,20 @@ from .serializers import TradeHistorySerializer,TradesHistorySerializer
 
 from drf_yasg.utils import swagger_auto_schema
 from django.utils import timezone
+from datetime import datetime, timedelta
+three_days_ago = datetime.now() - timedelta(days=3)
 
 
-def get_open_orders(api_key,api_secret):
+
+def get_open_orders(user,api_key,api_secret,symbol):
 
     """
         need to get all symbols from database
     """
-    symbol = 'XRPUSDT'  
+    # symbol = 'XRPUSDT'  
+    # SignalFollowedBy.objects.filter(user=user).values_list("signal__symbol__symbol", flat=True).distinct()
+ 
+    # print(symbols)
     exchange = ccxt.binance(
     {
         "apiKey": api_key,
@@ -29,17 +35,17 @@ def get_open_orders(api_key,api_secret):
     })
     exchange.set_sandbox_mode(True)
 
+    data = []
 
     try:
         open_orders = exchange.fetch_open_orders(symbol=symbol)
-        data = []
         if open_orders:
             for order in open_orders:
                 print(order)
                 # print(order)
                 data.append({"symbol":symbol,"order_id":order["id"],"status":order["status"],"type":order["type"],"side":order["side"],"price":order["price"],"amount":order["amount"]})
                 # print(f"Order ID: {order['id']}, Status: {order['status']} ,Type: {order['type']}, Side: {order['side']}, Price: {order['price']}, Amount: {order['amount']}]")
-            return {"data":data,"message":"open orders found"}
+            return data
         else:
             return {"data":data,"message":"no open orders found"}
     except Exception as e:
@@ -53,9 +59,15 @@ class OpenOrders(APIView):
         # print(request.user)
         user_key = UserKey.objects.filter(user=request.user).first()
         if user_key:
-            data = get_open_orders(user_key.api_key,user_key.api_secret)
-            data["succes"] = True
-            return Response(data, status=status.HTTP_200_OK)
+            symbols = SignalFollowedBy.objects.filter(user=user_key.user, created_on__gte=three_days_ago) \
+                .values_list("signal__symbol__symbol", flat=True) \
+                .distinct()
+            datas = []
+            for symbol in symbols:
+                data = get_open_orders(user_key.user,user_key.api_key,user_key.api_secret,symbol)
+                datas.append(data)
+            # datas["succes"] = True
+            return Response({"data":datas,"success":True}, status=status.HTTP_200_OK)
         else:
             return Response({"data":[],"message": "Update Your API key and secret"}, status=status.HTTP_204_NO_CONTENT)
         
