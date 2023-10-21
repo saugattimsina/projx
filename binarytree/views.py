@@ -167,14 +167,7 @@ from .models import BinaryParents
 
 
 def determine_rank_in_tree(request):
-    user = User.objects.get(id=103454)
-    # print(user)
-    x = MLMBinary.objects.get(name=user)
-    ancestors = x.get_ancestors()
-    # print(ancestors)
-    # y = MLMMember.objects.get(user=user)
-    # ancestor = y.get_ancestors()
-    # print(ancestor)
+    user = User.objects.get(id=349)
     user.is_suscribed = True
     user.save()
     sub = Subscription.objects.get(id=2)
@@ -184,19 +177,6 @@ def determine_rank_in_tree(request):
         date_transaction=datetime.now(),
         amount=100,
     )
-    # weekly_fast_start_commissions(ancestors)
-    # for ancestor in ancestors:
-    #     try:
-    #         binary_parent = BinaryParents.objects.get(user=user)
-    #     except:
-    #         binary_parent = BinaryParents.objects.create(user=user)
-    #     binary_parent.parents.add(ancestor)
-    #     binary_parent.save()
-    #     # print(determinerank(ancestor.user))
-    # binary_parent = BinaryParents.objects.get(user=user)
-    # print(binary_parent.parents.all())
-    # for parent in binary_parent.parents.all().order_by("-id")[:12]:
-    #     print(parent.name)
     return HttpResponse("ok")
 
 

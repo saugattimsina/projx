@@ -57,14 +57,25 @@ class MLMBinary(MP_Node):
 
 
 class MLMRank(models.Model):
-    name = models.CharField(max_length=150)
+    rank_choice = (
+        ("Unranked", "Unranked"),
+        ("Bronze", "Bronze"),
+        ("Silver", "Silver"),
+        ("Gold", "Gold"),
+        ("Platinum", "Platinum"),
+        ("Diamond", "Diamond"),
+    )
+    equivalent_name = models.CharField(
+        max_length=25, choices=rank_choice, default="Unranked"
+    )
+    rank_name = models.CharField(max_length=25, null=True, blank=True)
     min_referrals = models.IntegerField(null=True, blank=True)
     max_referrals = models.IntegerField(null=True, blank=True)
     min_team_size = models.IntegerField(null=True, blank=True)
     max_team_size = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.rank_name
 
 
 class UserRank(models.Model):
@@ -72,7 +83,7 @@ class UserRank(models.Model):
     rank = models.ForeignKey(MLMRank, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.username} {self.rank.name}"
+        return f"{self.user} {self.rank}"
 
 
 class BinaryParents(models.Model):

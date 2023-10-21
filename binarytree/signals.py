@@ -8,13 +8,16 @@ from binarytree.determine_rank import find_all_parent_node
 @receiver(post_save, sender=User)
 def create_default_rank(sender, instance, created, **kwargs):
     if created:
-        default_rank = MLMRank.objects.get_or_create(
-            name="Distributor",
-            min_referrals=0,
-            max_referrals=2,
-            min_team_size=0,
-            max_team_size=2,
-        )[0]
+        try:
+            default_rank = MLMRank.objects.filter(equivalent_name="Unranked")[0]
+        except MLMRank.DoesNotExist:
+            default_rank = MLMRank.objects.create(
+                equivalent_name="Unranked",
+                min_referrals=0,
+                max_referrals=2,
+                min_team_size=0,
+                max_team_size=2,
+            )
         if default_rank:
             x = UserRank.objects.create(user=instance, rank=default_rank)
             user = User.objects.get(id=x.user.id)

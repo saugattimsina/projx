@@ -25,4 +25,3 @@ class TradeSignalsForm(forms.ModelForm):
             "amount_4",
             "percentage_4",
         )
-        # ('symbol','trade_side','position_amount','leverage','trailing_stop_percent','take_profit_percent')

@@ -26,7 +26,7 @@ def calculate_commission(ancestors, amount, reffered_by, refered_user):
     level = len(ancestors)
     for ancestor in ancestors:
         user = User.objects.get(id=ancestor.user.id)
-        rank = UserRank.objects.get(user=user).rank.name
+        rank = UserRank.objects.get(user=user).rank.equivalent_name
         print("user :", user)
         print("rank :", rank)
         print("level :", level)
