@@ -192,7 +192,7 @@ class VerifyOTPSerializer(serializers.Serializer):
         else:
             sub = {}
         rank = UserRank.objects.get(user=user)
-        user_rank = rank.rank.name
+        user_rank = rank.rank.rank_name
         return {
             "token": token.key,
             "user": {
