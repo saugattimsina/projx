@@ -75,6 +75,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         style={"input_type": "password"}, write_only=True
     )
     email = serializers.EmailField()
+    referal = serializers.CharField()
 
     class Meta:
         model = User
@@ -86,7 +87,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "confirm_password",
-            "refered",
+            "referal",
         ]
         extra_kwargs = {"password": {"write_only": True}}
 
@@ -127,6 +128,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         email = validated_data["email"]
         self.validate_email(email)
+        try:
+            refered = User.objects.get(username = validated_data['referal'])
+        except Exception as e:
+
+            raise serializers.ValidationError("unknown referal")
 
         # Create the user instance without custom fields
         user = User(username=validated_data["username"], email=validated_data["email"])
@@ -134,8 +140,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user.name = validated_data["name"]
         user.set_password(password)
         # user.telegram_id = validated_data["telegram_id"]
-        print(validated_data["refered"])
-        user.refered = validated_data["refered"]
+        # print(validated_data["refered"])
+        user.refered = refered
         # print(refered)
         user.is_client = True
         # Save the user instance with custom fields

@@ -42,7 +42,7 @@ def get_open_orders(user,api_key,api_secret,symbol):
     # print(symbols)
     exchange = ccxt.binance(
         {
-            "apiKey": api_key,
+                        "apiKey": api_key,
             "secret": api_secret,
             "enableRateLimit": True,
             "options": {"defaultType": "future"},

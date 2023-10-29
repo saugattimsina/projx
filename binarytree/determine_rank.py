@@ -6,6 +6,7 @@ def determinerank(ancestors):
     if len(ancestors) != 0:
         for ancestor in ancestors:
             user = ancestor.user
+            # this have an issur
             user_rank = UserRank.objects.get(user=user)
             print(user)
             print(user_rank.rank)

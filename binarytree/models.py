@@ -74,8 +74,8 @@ class MLMRank(models.Model):
     min_team_size = models.IntegerField(null=True, blank=True)
     max_team_size = models.IntegerField(null=True, blank=True)
 
-    def __str__(self):
-        return self.rank_name
+    # def __str__(self):
+    #     return self.rank_name
 
 
 class UserRank(models.Model):
