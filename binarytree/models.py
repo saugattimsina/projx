@@ -88,4 +88,4 @@ class UserRank(models.Model):
 
 class BinaryParents(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    parents = models.ManyToManyField(MLMBinary)
+    parents = models.ManyToManyField(MLMBinary,null=True,blank=True)
