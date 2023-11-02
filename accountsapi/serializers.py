@@ -129,9 +129,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         email = validated_data["email"]
         self.validate_email(email)
         try:
-            refered = User.objects.get(username = validated_data['referal'])
+            refered = User.objects.get(username=validated_data["referal"])
         except Exception as e:
-
             raise serializers.ValidationError("unknown referal")
 
         # Create the user instance without custom fields

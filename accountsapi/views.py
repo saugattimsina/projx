@@ -260,7 +260,7 @@ class ValidateEmailOTP(APIView):
             else:
                 return Response(
                     {"message": "Procced to password change", "success": True},
-                    status=status.HTTP_400_BAD_REQUEST,
+                    status=status.HTTP_200_OK,
                 )
         except User.DoesNotExist:
             return Response({"message": "User not found", "success": False}, status=404)
