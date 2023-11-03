@@ -9,3 +9,9 @@ ccxt==4.0.101 # https://docs.ccxt.com/#/
 pillow==10.0.1
 pyotp==2.9.0 # https://pyauth.github.io/pyotp/
 qrcode==7.4.2 # https://github.com/lincolnloop/python-qrcode
+django-ckeditor==6.7.0
+drf-yasg==1.21.7
+django-treebeard==4.7
+django-cors-headers==4.3.0
+django-debug-toolbar==4.2.0
+django-jsonview==2.0.0
