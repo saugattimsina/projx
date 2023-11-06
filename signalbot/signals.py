@@ -23,7 +23,8 @@ reply_url = f"https://api.telegram.org/bot{settings.TELEGRAM_API_TOKEN}/sendMess
 def create_default_subscription(sender, instance, created, **kwargs):
     print(instance)
     # if created:
-    users_with_uuid = User.objects.filter(is_client=False)
+    print("signal recived")
+    users_with_uuid = User.objects.filter(is_client=True)
 
     keyboard = { 
         "inline_keyboard": [
@@ -41,7 +42,7 @@ def create_default_subscription(sender, instance, created, **kwargs):
             print("auto set trade",user)
             
             user_key = UserKey.objects.filter(user=user)
-            print(user_key)
+            print("key user ",user_key)
             if user_key:
                 print("thau ma aayo")
                 x = create_my_trade(instance,user,user_key[0])
