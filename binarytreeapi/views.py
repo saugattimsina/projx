@@ -22,12 +22,14 @@ def get_descendants_up_to_2_levels(node, parent):
         child_data = {
             "level": 1,
             "user": child.name.username,
+            "user_rank": UserRank.objects.get(user=child.name).rank.equivalent_name,
+            "user_rank_image": UserRank.objects.get(user=child.name).rank.rank_image.path,           
             "left_children": [],
             "right_children": [],
         }
 
         for sub_child in child.get_children():
-            sub_child_data = {"level": 2, "user": sub_child.name.username}
+            sub_child_data = {"level": 2, "user": sub_child.name.username, "user_rank": UserRank.objects.get(user=sub_child.name).rank.equivalent_name,"user_rank_image": UserRank.objects.get(user=sub_child.name).rank.rank_image.path}
             if inner_count == 0:
                 child_data["left_children"].append(sub_child_data)
                 inner_count = inner_count + 1
@@ -71,7 +73,7 @@ class GetMYParentandChildren(APIView):
                     else:
                         date = user_sub.end_date
                     enrollment_tree_user.append(
-                        {"username": users.user.username, "expire_date": date}
+                        {"user": users.user.username, "user_rank": UserRank.objects.get(user=users.user).rank.equivalent_name, "user_rank_image": UserRank.objects.get(user=users.user).rank.rank_image.path, "expire_date": date}
                     )
                 return Response(
                     {
@@ -104,7 +106,11 @@ class GetUserRankApiView(APIView):
                 .order_by("min_referrals")
                 .first()
             )
-            print(next_rank)
+            previous_rank = (
+                MLMRank.objects.filter(min_referrals__lt=user_rank.rank.min_referrals)
+                .order_by("-min_referrals")
+                .first()
+            )
             x = MLMMember.objects.get(user=user)
             referrals = x.get_children_count()
             team_size = x.get_descendant_count()
@@ -119,9 +125,13 @@ class GetUserRankApiView(APIView):
                     "message": "User rank and requirement for next rank fetched successfully",
                     "data": {
                         "user_rank": user_rank.rank.equivalent_name,
+                        "user_rank_image": user_rank.rank.rank_image.path,
+                        "previous_rank" : previous_rank.equivalent_name,
+                        "previous_rank_image" : previous_rank.rank_image.path,
                         "next_rank": next_rank.equivalent_name,
+                        "next_rank_image": next_rank.rank_image.path,
                         "condition_for_next_rank": {
-                            "required_refferals": required_refferals,
+                            "required_direct_refferal": required_refferals,
                             "required_team_size": required_team_size,
                         },
                     },

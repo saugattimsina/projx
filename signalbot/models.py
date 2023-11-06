@@ -78,6 +78,9 @@ class ReferalWallet(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     # is_withdrawn = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f"{self.user} {self.amount}"
+
 
 class ReferalWithdrawlHistory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -108,6 +111,9 @@ class Binawallet(models.Model):
     amount = models.FloatField()
     created_on = models.DateTimeField(auto_now_add=True)
     # is_withdrawn = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user} {self.amount}"
 
 
 class BinaryWithDrawlHistory(models.Model):

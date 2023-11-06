@@ -5,6 +5,7 @@ from datetime import date
 
 
 def calculate_matrix_commission(user, amount):
+    print(user)
     rank = UserRank.objects.get(user=user).rank.equivalent_name
     binary_parent = BinaryParents.objects.get(user=user)
     if rank == "Unranked":
@@ -13,7 +14,7 @@ def calculate_matrix_commission(user, amount):
             if not wallet:
                 wallet = Binawallet.objects.create(user=parent.name, amount=0)
             c_amount = amount * 0.025
-            wallet.amount = c_amount
+            wallet.amount = wallet.amount + c_amount
             wallet.save()
             BinaryIncome.objects.create(
                 paid_by=user,
@@ -28,7 +29,7 @@ def calculate_matrix_commission(user, amount):
                 wallet = Binawallet.objects.create(user=parent.name, amount=0)
 
             c_amount = amount * 0.025
-            wallet.amount = c_amount
+            wallet.amount = wallet.amount + c_amount
             wallet.save()
             BinaryIncome.objects.create(
                 paid_by=user,
@@ -43,7 +44,7 @@ def calculate_matrix_commission(user, amount):
                 wallet = Binawallet.objects.create(user=parent.name, amount=0)
 
             c_amount = amount * 0.025
-            wallet.amount = c_amount
+            wallet.amount = wallet.amount + c_amount
             wallet.save()
             BinaryIncome.objects.create(
                 paid_by=user,
@@ -58,7 +59,7 @@ def calculate_matrix_commission(user, amount):
                 wallet = Binawallet.objects.create(user=parent.name, amount=0)
 
             c_amount = amount * 0.025
-            wallet.amount = c_amount
+            wallet.amount = wallet.amount + c_amount
             wallet.save()
             BinaryIncome.objects.create(
                 paid_by=user,
@@ -73,7 +74,7 @@ def calculate_matrix_commission(user, amount):
                 wallet = Binawallet.objects.create(user=parent.name, amount=0)
 
             c_amount = amount * 0.025
-            wallet.amount = c_amount
+            wallet.amount = wallet.amount + c_amount
             wallet.save()
             BinaryIncome.objects.create(
                 paid_by=user,
@@ -88,7 +89,7 @@ def calculate_matrix_commission(user, amount):
                 wallet = Binawallet.objects.create(user=parent.name, amount=0)
 
             c_amount = amount * 0.025
-            wallet.amount = c_amount
+            wallet.amount = wallet.amount + c_amount
             wallet.save()
             BinaryIncome.objects.create(
                 paid_by=user,

@@ -29,6 +29,10 @@ def determinerank(ancestors):
                 print("Rank by referrals is None. Handle this case.")
                 continue  # Skip this user
 
+            if rank_by_team_size is None:
+                print("Rank by team size is None. Handle this case.")
+                continue
+
             # If the user's referrals and team size match the same rank, return that rank.
             if rank_by_referrals == rank_by_team_size:
                 print(rank_by_referrals)
