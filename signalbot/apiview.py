@@ -27,7 +27,7 @@ from .serializers import (
 from drf_yasg.utils import swagger_auto_schema
 from django.utils import timezone
 from datetime import datetime, timedelta
-three_days_ago = datetime.now() - timedelta(days=3)
+
 
 
 
@@ -85,6 +85,7 @@ class OpenOrders(APIView):
     def get(self, request, format=None):
         # print(request.user)
         user_key = UserKey.objects.filter(user=request.user).first()
+        three_days_ago = datetime.now() - timedelta(days=30)
         if user_key:
             symbols = SignalFollowedBy.objects.filter(user=user_key.user, created_on__gte=three_days_ago) \
                 .values_list("signal__symbol__symbol", flat=True) \
@@ -94,6 +95,7 @@ class OpenOrders(APIView):
                 data = get_open_orders(user_key.user,user_key.api_key,user_key.api_secret,symbol)
                 datas.append(data)
             # datas["succes"] = True
+            
             return Response({"data":datas,"success":True}, status=status.HTTP_200_OK)
         else:
             return Response(
@@ -294,3 +296,45 @@ class ReferalIncomeHistoryAPIView(ModelViewSet):
                 {"data": [], "message": "no user found", "sucess": False},
                 status=status.HTTP_204_NO_CONTENT,
             )
+
+
+# def get_positions(key,secret):
+#     balance = exchange.fetch_balance()
+ 
+
+class ShowPositions(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        responses={200: TradesHistorySerializer()},
+        operation_summary="Test user history",
+    ) 
+    def post(self,request):
+        user_key = UserKey.objects.filter(user=request.user).first()
+        if user_key:
+            exchange = ccxt.binance(
+                {
+                    "apiKey": user_key.api_key,
+                    "secret": user_key.api_secret,
+                    "enableRateLimit": True,
+                    "options": {"defaultType": "future"},
+                }
+            )
+            exchange.set_sandbox_mode(True)
+            balance = exchange.fetch_balance()
+            positions = balance['info']['positions']
+            user_positions = []
+                # print(positions)
+            if positions:
+                for position in positions:
+                    if float(position['initialMargin']) != 0:
+                        print(position)   
+                        user_positions.append(position) 
+            if user_positions:
+                return Response({"data":user_positions,"message":"positions found","success":True},status=status.HTTP_200_OK)
+            else:
+                return Response({"data":[],"message":"no positions found","success":False},status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"data":[],"message":"no api key found","success":False},status=status.HTTP_204_NO_CONTENT)
+
+
