@@ -116,23 +116,24 @@ class GetUserRankApiView(APIView):
             team_size = x.get_descendant_count()
             required_refferals = 0
             required_team_size = 0
-            if referrals < next_rank.min_referrals:
-                required_refferals = next_rank.min_referrals - referrals
-            elif team_size < next_rank.min_team_size:
-                required_team_size = next_rank.min_team_size - team_size
+            if next_rank:
+                if referrals < next_rank.min_referrals:
+                    required_refferals = next_rank.min_referrals - referrals
+                elif team_size < next_rank.min_team_size:
+                    required_team_size = next_rank.min_team_size - team_size
             return Response(
                 {
                     "message": "User rank and requirement for next rank fetched successfully",
                     "data": {
-                        "user_rank": user_rank.rank.equivalent_name,
-                        "user_rank_image": user_rank.rank.rank_image.path,
-                        "previous_rank" : previous_rank.equivalent_name,
-                        "previous_rank_image" : previous_rank.rank_image.path,
-                        "next_rank": next_rank.equivalent_name,
-                        "next_rank_image": next_rank.rank_image.path,
+                        "user_rank": user_rank.rank.equivalent_name if user_rank else None,
+                        "user_rank_image": user_rank.rank.rank_image.path if user_rank.rank.rank_image else None,
+                        "previous_rank" : previous_rank.equivalent_name if previous_rank else None,
+                        "previous_rank_image" : previous_rank.rank_image.path if previous_rank else None,
+                        "next_rank": next_rank.equivalent_name if next_rank else None,
+                        "next_rank_image": next_rank.rank_image.path if next_rank else None,
                         "condition_for_next_rank": {
-                            "required_direct_refferal": required_refferals,
-                            "required_team_size": required_team_size,
+                            "required_direct_refferal": required_refferals if required_refferals > 0 else None,
+                            "required_team_size": required_team_size if required_team_size > 0 else None,
                         },
                     },
                     "success": True,
