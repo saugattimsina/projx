@@ -55,8 +55,8 @@ def determinerank(ancestors):
 
 
 def find_all_parent_node(user):
-    x = MLMMember.objects.get(user=user)
-    ancestors = x.get_ancestors()
+    # x = MLMMember.objects.get(user=user)
+    ancestors = user.get_ancestors()
     determinerank(ancestors)
 
 
