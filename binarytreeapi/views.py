@@ -132,8 +132,8 @@ class GetUserRankApiView(APIView):
                         "next_rank": next_rank.equivalent_name if next_rank else None,
                         "next_rank_image": next_rank.rank_image.url if next_rank else None,
                         "condition_for_next_rank": {
-                            "required_direct_refferal": required_refferals if required_refferals > 0 else None,
-                            "required_team_size": required_team_size if required_team_size > 0 else None,
+                            "required_direct_refferal": required_refferals,
+                            "required_team_size": required_team_size,
                         },
                     },
                     "success": True,
