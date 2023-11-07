@@ -83,8 +83,8 @@ class UserRank(models.Model):
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
     rank = models.ForeignKey(MLMRank, on_delete=models.SET_NULL, null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.user} {self.rank.equivalent_name}"
+    # def __str__(self):
+    #     return f"{self.user} {self.rank.equivalent_name}"
 
 
 class BinaryParents(models.Model):
