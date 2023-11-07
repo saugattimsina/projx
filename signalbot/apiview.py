@@ -445,7 +445,7 @@ class ShowPositions(APIView):
         responses={200: TradesHistorySerializer()},
         operation_summary="Test user history",
     )
-    def post(self, request):
+    def get(self, request):
         user_key = UserKey.objects.filter(user=request.user).first()
         if user_key:
             exchange = ccxt.binance(
