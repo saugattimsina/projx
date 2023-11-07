@@ -91,7 +91,7 @@ class GetMYParentandChildren(APIView):
                             ).rank.equivalent_name,
                             "user_rank_image": UserRank.objects.get(
                                 user=users.user
-                            ).rank.rank_image.path,
+                            ).rank.rank_image.url,
                             "expire_date": date,
                         }
                     )
