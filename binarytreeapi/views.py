@@ -131,8 +131,8 @@ class GetUserRankApiView(APIView):
                     "data": {
                         "current_rank":{
 
-                            "user_rank": user_rank.rank.equivalent_name if user_rank else None,
-                            "user_rank_image": user_rank.rank.rank_image.url if user_rank.rank.rank_image else None,
+                            "name": user_rank.rank.equivalent_name if user_rank else None,
+                            "image": user_rank.rank.rank_image.url if user_rank.rank.rank_image else None,
                             'total_referal' : referrals,
                             "team_size": team_size,
                         },
