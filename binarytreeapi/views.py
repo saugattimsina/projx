@@ -86,6 +86,7 @@ class GetMYParentandChildren(APIView):
                     enrollment_tree_user.append(
                         {
                             "user": users.user.username,
+                            "id":users.user.id,
                             "user_rank": UserRank.objects.get(
                                 user=users.user
                             ).rank.equivalent_name,
