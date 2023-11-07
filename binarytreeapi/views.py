@@ -55,8 +55,8 @@ def get_descendants_up_to_2_levels(node, parent):
             binarytree["right_children"].append(child_data)
             count = 0
 
-    descendants.append(binarytree)
-    return descendants
+    # descendants.append(binarytree)
+    return binarytree
 
 
 class GetMYParentandChildren(APIView):
