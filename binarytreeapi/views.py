@@ -119,8 +119,12 @@ class GetUserRankApiView(APIView):
             if next_rank:
                 if referrals < next_rank.min_referrals:
                     required_refferals = next_rank.min_referrals - referrals
+                    if required_refferals <0 :
+                        required_refferals = 0
                 elif team_size < next_rank.min_team_size:
                     required_team_size = next_rank.min_team_size - team_size
+                    if required_team_size <0 :
+                        required_team_size = 0
             return Response(
                 {
                     "message": "User rank and requirement for next rank fetched successfully",
