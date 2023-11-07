@@ -121,7 +121,7 @@ class GetUserRankApiView(APIView):
                     required_refferals = next_rank.min_referrals - referrals
                     if required_refferals <0 :
                         required_refferals = 0
-                elif team_size < next_rank.min_team_size:
+                if team_size < next_rank.min_team_size:
                     required_team_size = next_rank.min_team_size - team_size
                     if required_team_size <0 :
                         required_team_size = 0
