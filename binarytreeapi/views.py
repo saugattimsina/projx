@@ -23,13 +23,24 @@ def get_descendants_up_to_2_levels(node, parent):
             "level": 1,
             "user": child.name.username,
             "user_rank": UserRank.objects.get(user=child.name).rank.equivalent_name,
-            "user_rank_image": UserRank.objects.get(user=child.name).rank.rank_image.path,           
+            "user_rank_image": UserRank.objects.get(
+                user=child.name
+            ).rank.rank_image.path,
             "left_children": [],
             "right_children": [],
         }
 
         for sub_child in child.get_children():
-            sub_child_data = {"level": 2, "user": sub_child.name.username, "user_rank": UserRank.objects.get(user=sub_child.name).rank.equivalent_name,"user_rank_image": UserRank.objects.get(user=sub_child.name).rank.rank_image.path}
+            sub_child_data = {
+                "level": 2,
+                "user": sub_child.name.username,
+                "user_rank": UserRank.objects.get(
+                    user=sub_child.name
+                ).rank.equivalent_name,
+                "user_rank_image": UserRank.objects.get(
+                    user=sub_child.name
+                ).rank.rank_image.path,
+            }
             if inner_count == 0:
                 child_data["left_children"].append(sub_child_data)
                 inner_count = inner_count + 1
@@ -73,7 +84,16 @@ class GetMYParentandChildren(APIView):
                     else:
                         date = user_sub.end_date
                     enrollment_tree_user.append(
-                        {"user": users.user.username, "user_rank": UserRank.objects.get(user=users.user).rank.equivalent_name, "user_rank_image": UserRank.objects.get(user=users.user).rank.rank_image.path, "expire_date": date}
+                        {
+                            "user": users.user.username,
+                            "user_rank": UserRank.objects.get(
+                                user=users.user
+                            ).rank.equivalent_name,
+                            "user_rank_image": UserRank.objects.get(
+                                user=users.user
+                            ).rank.rank_image.path,
+                            "expire_date": date,
+                        }
                     )
                 return Response(
                     {
@@ -119,35 +139,43 @@ class GetUserRankApiView(APIView):
             if next_rank:
                 if referrals < next_rank.min_referrals:
                     required_refferals = next_rank.min_referrals - referrals
-                    if required_refferals <0 :
+                    if required_refferals < 0:
                         required_refferals = 0
                 elif team_size < next_rank.min_team_size:
                     required_team_size = next_rank.min_team_size - team_size
-                    if required_team_size <0 :
+                    if required_team_size < 0:
                         required_team_size = 0
             return Response(
                 {
                     "message": "User rank and requirement for next rank fetched successfully",
                     "data": {
-                        "current_rank":{
-
-                            "name": user_rank.rank.equivalent_name if user_rank else None,
-                            "image": user_rank.rank.rank_image.url if user_rank.rank.rank_image else None,
-                            'total_referal' : referrals,
+                        "current_rank": {
+                            "name": user_rank.rank.equivalent_name
+                            if user_rank
+                            else None,
+                            "image": user_rank.rank.rank_image.url
+                            if user_rank.rank.rank_image
+                            else None,
+                            "total_referal": referrals,
                             "team_size": team_size,
                         },
-                        "previous_rank":
-                        {
-                            "name" : previous_rank.equivalent_name if previous_rank else None,
-                            "image" : previous_rank.rank_image.url if previous_rank else None,
-
+                        "previous_rank": {
+                            "name": previous_rank.equivalent_name
+                            if previous_rank
+                            else None,
+                            "image": previous_rank.rank_image.url
+                            if previous_rank
+                            else None,
                         },
-                        "next_rank":{
+                        "next_rank": {
                             "name": next_rank.equivalent_name if next_rank else None,
                             "image": next_rank.rank_image.url if next_rank else None,
-                            "total_numbers_of_referal": next_rank.min_referrals if next_rank else None,
-                            "total_team_size": next_rank.min_team_size if next_rank else None,
-
+                            "total_numbers_of_referal": next_rank.min_referrals
+                            if next_rank
+                            else None,
+                            "total_team_size": next_rank.min_team_size
+                            if next_rank
+                            else None,
                         },
                         "condition_for_next_rank": {
                             "required_direct_refferal": required_refferals,
