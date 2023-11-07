@@ -129,11 +129,13 @@ class GetUserRankApiView(APIView):
                 {
                     "message": "User rank and requirement for next rank fetched successfully",
                     "data": {
+                        "current_rank":{
 
-                        "user_rank": user_rank.rank.equivalent_name if user_rank else None,
-                        "user_rank_image": user_rank.rank.rank_image.url if user_rank.rank.rank_image else None,
-                        'total_referal' : referrals,
-                        "team_size": team_size,
+                            "user_rank": user_rank.rank.equivalent_name if user_rank else None,
+                            "user_rank_image": user_rank.rank.rank_image.url if user_rank.rank.rank_image else None,
+                            'total_referal' : referrals,
+                            "team_size": team_size,
+                        },
                         "previous_rank":
                         {
                             "name" : previous_rank.equivalent_name if previous_rank else None,
