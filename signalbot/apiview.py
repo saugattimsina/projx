@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 import ccxt
+from django.db.models import Sum
 from user.models import UserKey
 
 from .models import (
@@ -15,6 +16,7 @@ from .models import (
     TradeHistory,
     ReferalIncome,
     ReferalWithdrawlHistory,
+    BinaryIncome,
 )
 from user.models import User
 
@@ -27,22 +29,22 @@ from .serializers import (
 from drf_yasg.utils import swagger_auto_schema
 from django.utils import timezone
 from datetime import datetime, timedelta
+from django.utils.dateparse import parse_date
+
 three_days_ago = datetime.now() - timedelta(days=3)
 
 
-
-def get_open_orders(user,api_key,api_secret,symbol):
-
+def get_open_orders(user, api_key, api_secret, symbol):
     """
     need to get all symbols from database
     """
-    # symbol = 'XRPUSDT'  
+    # symbol = 'XRPUSDT'
     # SignalFollowedBy.objects.filter(user=user).values_list("signal__symbol__symbol", flat=True).distinct()
- 
+
     # print(symbols)
     exchange = ccxt.binance(
         {
-                        "apiKey": api_key,
+            "apiKey": api_key,
             "secret": api_secret,
             "enableRateLimit": True,
             "options": {"defaultType": "future"},
@@ -86,15 +88,21 @@ class OpenOrders(APIView):
         # print(request.user)
         user_key = UserKey.objects.filter(user=request.user).first()
         if user_key:
-            symbols = SignalFollowedBy.objects.filter(user=user_key.user, created_on__gte=three_days_ago) \
-                .values_list("signal__symbol__symbol", flat=True) \
+            symbols = (
+                SignalFollowedBy.objects.filter(
+                    user=user_key.user, created_on__gte=three_days_ago
+                )
+                .values_list("signal__symbol__symbol", flat=True)
                 .distinct()
+            )
             datas = []
             for symbol in symbols:
-                data = get_open_orders(user_key.user,user_key.api_key,user_key.api_secret,symbol)
+                data = get_open_orders(
+                    user_key.user, user_key.api_key, user_key.api_secret, symbol
+                )
                 datas.append(data)
             # datas["succes"] = True
-            return Response({"data":datas,"success":True}, status=status.HTTP_200_OK)
+            return Response({"data": datas, "success": True}, status=status.HTTP_200_OK)
         else:
             return Response(
                 {"data": [], "message": "Update Your API key and secret"},
@@ -293,4 +301,62 @@ class ReferalIncomeHistoryAPIView(ModelViewSet):
             return Response(
                 {"data": [], "message": "no user found", "sucess": False},
                 status=status.HTTP_204_NO_CONTENT,
+            )
+
+
+class EarnningStatsApiView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id, starting_date=None, ending_date=None, format=None):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"data": [], "message": "No user found", "success": False},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if starting_date and ending_date:
+            start_date = parse_date(starting_date)
+            print(start_date)
+            end_date = parse_date(ending_date)
+            total_referal_income = ReferalIncome.objects.filter(
+                money_allocated_to=user,
+                created_on__date__gte=start_date,
+                created_on__date__lte=end_date,
+            ).aggregate(total_amount=Sum("amount"))["total_amount"]
+            total_matrix_income = BinaryIncome.objects.filter(
+                money_allocated_to=user,
+                created_on__date__gte=start_date,
+                created_on__date__lte=end_date,
+            ).aggregate(total_amount=Sum("amount"))["total_amount"]
+            return Response(
+                {
+                    "data": {
+                        "total_referal_income": total_referal_income,
+                        "total_matrix_income": total_matrix_income,
+                    },
+                    "message": "Earning stats fetched",
+                    "success": True,
+                },
+                status=status.HTTP_200_OK,
+            )
+        else:
+            total_referal_income = ReferalIncome.objects.filter(
+                money_allocated_to=user
+            ).aggregate(total_amount=Sum("amount"))["total_amount"]
+            total_matrix_income = BinaryIncome.objects.filter(
+                money_allocated_to=user
+            ).aggregate(total_amount=Sum("amount"))["total_amount"]
+            return Response(
+                {
+                    "data": {
+                        "total_referal_income": total_referal_income,
+                        "total_matrix_income": total_matrix_income,
+                    },
+                    "message": "Earning stats fetched",
+                    "success": True,
+                },
+                status=status.HTTP_200_OK,
             )
