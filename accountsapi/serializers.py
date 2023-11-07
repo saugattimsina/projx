@@ -20,6 +20,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password, check_password
 from subscription.models import UserSubcription
 from binarytree.models import MLMRank, UserRank
+import ccxt
 
 User = get_user_model()
 
@@ -210,9 +211,35 @@ class VerifyOTPSerializer(serializers.Serializer):
 
 
 class UserBinancyAPIKey(serializers.ModelSerializer):
+    def validate(self,data):
+        api_key = data.get("api_key")
+        api_secret = data.get("api_secret")
+        print(api_key)
+        print(api_secret)
+        exchange = ccxt.binance({
+        'apiKey': api_key,
+        'secret': api_secret,
+        "options": {"defaultType": "future"},
+        })
+        exchange.set_sandbox_mode(True)
+        try:
+            # Fetch account information (e.g., balances)
+            account_info = exchange.fetchBalance()
+            print(account_info)
+            return data
+            
+        except ccxt.NetworkError as e:
+            print("network_error")
+            raise ValidationError("Network error")
+        except ccxt.ExchangeError as e:
+            print("exchange_error")
+            print(e)
+            raise ValidationError("Invalid API key or secret")
     class Meta:
         model = UserKey
         fields = ["api_key", "api_secret"]
+
+
 
 
 class ChangePasswordSerializer(serializers.Serializer):
