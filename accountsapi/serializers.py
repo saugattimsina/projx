@@ -190,8 +190,11 @@ class VerifyOTPSerializer(serializers.Serializer):
             sub["subscription_end_date"] = subscription.end_date
         else:
             sub = {}
+
+
         rank = UserRank.objects.get(user=user)
         user_rank = rank.rank.rank_name
+
         return {
             "token": token.key,
             "user": {
