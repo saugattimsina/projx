@@ -6,6 +6,7 @@ from .models import Subscription, UserSubcription, UserSubPaymentHistory
 from binarytree.models import MLMMember, MLMBinary, BinaryParents
 from subscription.enroller_commision import calculate_commission
 from subscription.matrix_commision import calculate_matrix_commission
+from binarytree.determine_rank import find_all_parent_node
 
 # ,ForcedMatrix
 
@@ -78,85 +79,105 @@ def create_default_subscription(sender, instance, created, **kwargs):
             default_subscription = Subscription.objects.get(package_type="free")
             if default_subscription:
                 UserSubcription.objects.create(user=instance, plan=default_subscription)
-
         if instance.is_superuser:
             MLMMember.add_root(user=instance, name=instance.username)
+            MLMBinary.add_root(name=instance)
+
+
+@receiver(post_save, sender=UserSubcription)
+def create_default_subscription(sender, instance, created, **kwargs):
+    if created:
+        user = instance.user
+        pakage_type = instance.plan.package_type
+        if pakage_type != "free":
+            user.is_suscribed = True
+            user.save()
+
+        if user.is_superuser:
+            MLMMember.add_root(user=user, name=user.username)
         else:
-            parent = MLMMember.objects.get(user=instance.refered)
-            parent.add_child(user=instance, name=instance.username, sponsor=parent)
+            if user.is_suscribed:
+                if not MLMMember.objects.filter(user=user).exists():
+                    parent = MLMMember.objects.get(user=user.refered)
+                    parent.add_child(user=user, name=user.username, sponsor=parent)
 
-        if not instance.is_superuser:
-            binary_members = MLMBinary.objects.all()
-            if binary_members.count() == 0:
-                print("yaha1")
-                MLMBinary.add_root(name=instance)
-            else:
-                print("yaha2")
-                parentbinary = MLMBinary.objects.get(name=instance.refered)
-                print("parent_binary", parentbinary)
-                # siblings = parent.get_siblings()
-                decends = parentbinary.get_children_count()
-                print("munber of decends ", decends)
-                if not decends:
-                    print("yah3")
-                    x = parentbinary.add_child(name=instance, parent=parentbinary)
-                    parentbinary.user_left = x
-                    parentbinary.save()
-                elif decends == 1:
-                    print("yah44")
+        if not user.is_superuser:
+            if user.is_suscribed:
+                if not MLMBinary.objects.filter(name=user).exists():
+                    binary_members = MLMBinary.objects.all()
+                    if binary_members.count() == 0:
+                        print("yaha1")
 
-                    x = parentbinary.add_child(name=instance, parent=parentbinary)
-                    parentbinary.user_right = x
-                    parentbinary.save()
-                elif decends == 2:
-                    print("yah5")
-                    get_all_childs = parent.get_children_count()
-                    # print(get_all_childs)
-                    if get_all_childs % 2 == 1:
-                        print("yah6")
-                        left_user = parentbinary.get_children().first()
-                        node = get_all_nodes_bfs(left_user)
-                        spilled_parent = node["node"]
-                        child_num = node["children"]
-                        if child_num == 0:
-                            x = spilled_parent.add_child(
-                                name=instance, parent=spilled_parent
-                            )
-                            spilled_parent.user_left = x
-                            spilled_parent.save()
-                        elif child_num == 1:
-                            x = spilled_parent.add_child(
-                                name=instance, parent=spilled_parent
-                            )
-                            spilled_parent.user_right = x
-                            spilled_parent.save()
-                        print("left user", left_user)
-                        """ need to add user in the left wing """
+                        MLMBinary.add_root(name=user)
                     else:
-                        print("yah7")
-                        right_user = parentbinary.get_children().last()
-                        node = get_all_nodes_bfs(right_user)
-                        spilled_parent = node["node"]
-                        child_num = node["children"]
-                        if child_num == 0:
-                            x = spilled_parent.add_child(
-                                name=instance, parent=spilled_parent
-                            )
-                            spilled_parent.user_left = x
-                            spilled_parent.save()
-                        elif child_num == 1:
-                            x = spilled_parent.add_child(
-                                name=instance, parent=spilled_parent
-                            )
-                            spilled_parent.user_right = x
-                            spilled_parent.save()
+                        print("yaha2")
+                        parentbinary = MLMBinary.objects.get(name=user.refered)
+                        print("parent_binary", parentbinary)
+                        # siblings = parent.get_siblings()
+                        decends = parentbinary.get_children_count()
+                        print("munber of decends ", decends)
+                        if not decends:
+                            print("yah3")
+                            x = parentbinary.add_child(name=user, parent=parentbinary)
+                            parentbinary.user_left = x
+                            parentbinary.save()
+                        elif decends == 1:
+                            print("yah44")
 
-                        """ need to add user in the right wing """
-                else:
-                    print("oops something went wrong")
+                            x = parentbinary.add_child(name=user, parent=parentbinary)
+                            parentbinary.user_right = x
+                            parentbinary.save()
+                        elif decends == 2:
+                            print("yah5")
+                            get_all_childs = parent.get_children_count()
+                            # print(get_all_childs)
+                            if get_all_childs % 2 == 1:
+                                print("yah6")
+                                left_user = parentbinary.get_children().first()
+                                node = get_all_nodes_bfs(left_user)
+                                spilled_parent = node["node"]
+                                child_num = node["children"]
+                                if child_num == 0:
+                                    x = spilled_parent.add_child(
+                                        name=user, parent=spilled_parent
+                                    )
+                                    spilled_parent.user_left = x
+                                    spilled_parent.save()
+                                elif child_num == 1:
+                                    x = spilled_parent.add_child(
+                                        name=user, parent=spilled_parent
+                                    )
+                                    spilled_parent.user_right = x
+                                    spilled_parent.save()
+                                print("left user", left_user)
+                                """ need to add user in the left wing """
+                            else:
+                                print("yah7")
+                                right_user = parentbinary.get_children().last()
+                                node = get_all_nodes_bfs(right_user)
+                                spilled_parent = node["node"]
+                                child_num = node["children"]
+                                if child_num == 0:
+                                    x = spilled_parent.add_child(
+                                        name=user, parent=spilled_parent
+                                    )
+                                    spilled_parent.user_left = x
+                                    spilled_parent.save()
+                                elif child_num == 1:
+                                    x = spilled_parent.add_child(
+                                        name=user, parent=spilled_parent
+                                    )
+                                    spilled_parent.user_right = x
+                                    spilled_parent.save()
+
+                                """ need to add user in the right wing """
+                        else:
+                            print("oops something went wrong")
+                user = User.objects.get(id=user.id)
+                find_all_parent_node(user=user)
 
 
-@receiver(post_save, sender=UserSubPaymentHistory)
+@receiver(post_save, sender=UserSubcription)
 def enrollment_commision(sender, instance, created, **kwargs):
     if created:
         print(1)
@@ -166,7 +187,7 @@ def enrollment_commision(sender, instance, created, **kwargs):
             no_sub_payment = UserSubPaymentHistory.objects.filter(user=user).count()
             if no_sub_payment == 1:
                 print(3)
-                amount = instance.subscription.price
+                amount = instance.plan.price
                 x = MLMMember.objects.get(user=user)
                 reffered_by = user.refered
                 refered_user = user
@@ -188,5 +209,5 @@ def enrollment_commision(sender, instance, created, **kwargs):
                     binary_parent.save()
             elif no_sub_payment > 1:
                 print(4)
-                amount = instance.subscription.price
+                amount = instance.plan.price
                 calculate_matrix_commission(user=user, amount=amount)

@@ -161,22 +161,26 @@ def weekly_fast_start_commissions(ancestors):
         level = level - 1
 
 
-from subscription.models import UserSubPaymentHistory, Subscription
+from subscription.models import UserSubPaymentHistory, Subscription, UserSubcription
 from datetime import datetime
 from .models import BinaryParents
 
 
 def determine_rank_in_tree(request):
-    user = User.objects.get(id=403)
-    user.is_suscribed = True
-    user.save()
-    sub = Subscription.objects.get(id=2)
-    UserSubPaymentHistory.objects.create(
-        user=user,
-        subscription=sub,
-        date_transaction=datetime.now(),
-        amount=100,
-    )
+    x = User.objects.get(username="admin")
+    plan = Subscription.objects.get(package_type="paid")
+    for i in range(1, 101):
+        user = User.objects.create(
+            username=f"test{i}", password="yamagod123a@", refered=x
+        )
+        if i % 2 == 0:
+            UserSubcription.objects.create(user=user, plan=plan)
+            UserSubPaymentHistory.objects.create(
+                user=user,
+                subscription=plan,
+                date_transaction=datetime.now(),
+                amount=plan.price,
+            )
     return HttpResponse("ok")
 
 
@@ -193,9 +197,17 @@ def create_parents_binary(user):
 
 
 def determineparents(request):
-    print("hello")
-    # print(request.user)
-    x = User.objects.get(username="abcd1")
-    create_parents_binary(x)
+    x = User.objects.get(username="aadarsha")
+    plan = Subscription.objects.get(package_type="paid")
+    for i in range(1, 101):
+        user = User.objects.create(username="test1", password="yamagod123a@", refered=x)
+        if i % 2 == 0:
+            UserSubcription.objects.create(user=user, plan=plan)
+            UserSubPaymentHistory.objects.create(
+                useer=user,
+                subscription=plan,
+                date_transaction=datetime.now(),
+                amount=plan.price,
+            )
 
     return HttpResponse("ok")

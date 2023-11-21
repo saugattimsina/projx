@@ -9,9 +9,8 @@ from binarytree.determine_rank import find_all_parent_node
 def create_default_rank(sender, instance, created, **kwargs):
     if created:
         try:
-
             default_rank = MLMRank.objects.get(equivalent_name="Unranked")
-            
+
         except MLMRank.DoesNotExist:
             default_rank = MLMRank.objects.create(
                 equivalent_name="Unranked",
@@ -22,5 +21,6 @@ def create_default_rank(sender, instance, created, **kwargs):
             )
         if default_rank:
             x = UserRank.objects.create(user=instance, rank=default_rank)
-            user = User.objects.get(id=x.user.id)
-            find_all_parent_node(user=user)
+
+            # user = User.objects.get(id=x.user.id)
+            # find_all_parent_node(user=user)
