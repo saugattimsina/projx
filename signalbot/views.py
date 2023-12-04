@@ -1,12 +1,14 @@
+from django.utils import timezone
 from django.shortcuts import render, redirect
 
 # Create your views he
 import queue
 
-from .models import TradeSignals, SignalFollowedBy, TradeSymbol
+from .models import TradeSignals, SignalFollowedBy, TradeSymbol, TradeHistory
 from .forms import TradeSignalsForm
 from django.views.generic import CreateView, ListView
 from django.urls import reverse_lazy
+from django.http import HttpResponse
 
 from user.models import User
 from rest_framework.views import APIView
@@ -14,7 +16,7 @@ from rest_framework.response import Response
 from django.conf import settings
 from .utils import process_telegram_message
 from rest_framework import status
-from django.db.models import Count
+from django.db.models import Count, Sum
 import ccxt
 from jsonview.decorators import json_view
 
@@ -146,3 +148,23 @@ def pair_info(request):
 
             # return {"symbol":
     return {"success": False}
+
+
+def showTotalProfit(request):
+    if request.method == "POST":
+        date = request.POST.get("selectedDate")
+        trades_today = TradeHistory.objects.filter(created_on__date=date)
+    else:
+        today = timezone.now().date()
+        trades_today = TradeHistory.objects.filter(created_on__date=today)
+
+    total_profit_today = (
+        trades_today.aggregate(Sum("profit_loss"))["profit_loss__sum"] or 0.0
+    )
+
+    context = {
+        "trades_today": trades_today,
+        "total_profit_today": total_profit_today,
+    }
+
+    return render(request, "signalbot/total_profit.html", context)

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                   <div class="col-sm-12">
+                        <form id="date-select-form" style="padding-top: 5rem" action="{% url 'signalbot:showTotalProfit' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-5">
+                                    <div class="form-group">
+                                        <input type="date" class="form-control" id="selectedDate" name="selectedDate" placeholder="Select Date" required>     
+                                    </div>
+                                </div>
+                                <div class="col-5">
+                                    <button class="btn btn-info" type="submit">Filter</button>      
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="col-sm-12">
+
+                        <table class="table table-striped table-bodered">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Price</th>
+                                    <th>Amount</th>
+                                    <th>Symbol</th>
+                                    <th>Profit/Loss</th>
+                                    <th>Created On</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trades-table">
+                                {% for trade in trades_today %}
+                                <tr>
+                                    <td>{{ trade.user }}</td>
+                                    <td>{{ trade.price }}</td>
+                                    <td>{{ trade.amount }}</td>
+                                    <td>{{ trade.symbol }}</td>
+                                    <td>{{ trade.profit_loss }}</td>
+                                    <td>{{ trade.created_on }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <h1>Total Profit</h1>
+                    </div>
+                    <div class="col-5">
+                        <h1 class="text-end" id="total-profit">{{ total_profit_today }}</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+    
+{% endblock javascript %}

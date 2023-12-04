@@ -9,6 +9,7 @@ from .views import (
     ADDPairs,
     pair_info,
     #    ShowUserOrders
+    showTotalProfit,
 )
 from .apiview import OpenOrders, ShowBalance, TradeHistoryView, ShowPositions
 
@@ -36,4 +37,5 @@ urlpatterns = [
     ),
     path("balance/", ShowBalance.as_view(), name="balance-show"),
     path("positions/", ShowPositions.as_view(), name="positions-show"),
+    path("show/profit/", showTotalProfit, name="showTotalProfit"),
 ]
