@@ -9,6 +9,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
 import json
 from .trade_set import create_my_trade
+import logging
 
 # import tracemalloc
 # tracemalloc.start()
@@ -16,6 +17,8 @@ from .trade_set import create_my_trade
 # import telegram
 # bot = telegram.Bot(token='6167336537:AAGaviat4GGhS8gdTeoA6xHf9YRQ8-_-5QI')
 reply_url = f"https://api.telegram.org/bot{settings.TELEGRAM_API_TOKEN}/sendMessage"
+
+logger = logging.getLogger("django.request")
 
 
 # Convert the keyboard dictionary to JSON format
@@ -25,6 +28,7 @@ def create_default_subscription(sender, instance, created, **kwargs):
     print(instance)
     # if created:
     print("signal recived")
+    logger.info("signal recived")
     users_with_uuid = User.objects.filter(is_client=True)
 
     keyboard = {

@@ -1,7 +1,9 @@
 # Trading parameters
 import ccxt
 from .models import SignalFollowedBy, Portfolio
+import logging
 
+logger = logging.getLogger("django.request")
 # BINANCETN_API_KEY = "568fbe6822165f8feb172cd10ce0e1c39bd61f1102fab71d95fb9860eb94b226"
 # BINANCETN_API_SECRET = "cc8c83dd0013595db27a932f5eeda3f677beb5cd1e3c351b1e9b4b3c21a6364f"
 
@@ -172,9 +174,15 @@ def create_my_trade(signal_obj, user, userkey):
     additional_params = {}
     if price < round((price_now - price_now * 0.005), 4):
         print(f"price can't be less than {round((price_now - price_now * 0.005), 4)}")
+        logging.info(
+            f"price can't be less than {round((price_now - price_now * 0.005), 4)}"
+        )
         return f"price can't be less than {round((price_now - price_now * 0.005), 4)}"
     elif price > round((price_now + price_now * 0.005), 4):
         print(f"price can't be higher than {round((price_now + price_now * 0.005), 4)}")
+        logging.info(
+            f"price can't be higher than {round((price_now + price_now * 0.005), 4)}"
+        )
         return f"price can't be higher than {round((price_now + price_now * 0.005), 4)}"
 
     if trade_side == "buy" and price < stop_price:
@@ -193,6 +201,7 @@ def create_my_trade(signal_obj, user, userkey):
         )
         exchange1.set_sandbox_mode(True)
     except Exception as e:
+        logging.info(f"error setting sandbox mode {str(e)}")
         print(str(e))
         return str(e)
 
@@ -213,6 +222,7 @@ def create_my_trade(signal_obj, user, userkey):
 
     if quantity * price < 5:
         print("you must buy minimum $5 worth of Coins")
+        logging.info("you must buy minimum $5 worth of Coins")
         return "In sufficient balance"
 
     try:
@@ -225,10 +235,12 @@ def create_my_trade(signal_obj, user, userkey):
             price=price,
         )
         print("created order")
+        logging.info("created order")
     except Exception as e:
-        print(str(e))
+        logging.info(str(e))
         follower.is_cancelled = True
         follower.save()
+        logging.info("failed to create order")
         return "order could not be placed"
 
     inverted_side = "sell" if trade_side == "buy" else "buy"
@@ -244,8 +256,10 @@ def create_my_trade(signal_obj, user, userkey):
             params=additional_params,
         )
         print("stop_loss_order created")
+        logging.info("stop_loss_order created")
     except Exception as e:
         print(e)
+        logging.info(e)
         follower.is_cancelled = True
         follower.save()
         return "stop loss could not be placed"
@@ -279,8 +293,10 @@ def create_my_trade(signal_obj, user, userkey):
                 params=additional_params,
             )
             print("take_profit_order created")
+            logging.info("take_profit_order created")
         except Exception as e:
             print(e)
+            logging.info(e)
             follower.is_cancelled = True
             follower.save()
             return "take profit could not be placed"
