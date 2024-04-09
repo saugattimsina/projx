@@ -485,3 +485,11 @@ class ShowPositions(APIView):
                 {"data": [], "message": "no api key found", "success": False},
                 status=status.HTTP_204_NO_CONTENT,
             )
+
+
+
+class TradeView(APIView):
+    authentication_classes = [TokenAuthentication]
+    
+    def get(self, request, *args, **kwargs):
+        pass

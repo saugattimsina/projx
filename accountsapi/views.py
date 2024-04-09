@@ -129,7 +129,7 @@ class VerityOTPView(GenericAPIView):
             if not user.is_connected_to_authunticator:
                 user.is_connected_to_authunticator = True
                 user.save()
-            login_info: dict = serializer.save()
+            login_info = serializer.save()
             return Response(
                 {
                     "success": True,
