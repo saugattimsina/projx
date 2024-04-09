@@ -3,12 +3,13 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
 import requests
-from user.models import User,UserKey
+from user.models import User, UserKey
 from celery import shared_task
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
 import json
 from .trade_set import create_my_trade
+
 # import tracemalloc
 # tracemalloc.start()
 # # from telegram1 import send_telegram_message
@@ -26,7 +27,7 @@ def create_default_subscription(sender, instance, created, **kwargs):
     print("signal recived")
     users_with_uuid = User.objects.filter(is_client=True)
 
-    keyboard = { 
+    keyboard = {
         "inline_keyboard": [
             [{"text": "Follow Signal", "callback_data": instance.id}],
             # [{"text": "Option 2", "callback_data": "option2_data"}],
@@ -36,17 +37,24 @@ def create_default_subscription(sender, instance, created, **kwargs):
     keyboard_json = json.dumps(keyboard)
 
     message = f"New trade signal created: Symbol - {instance.symbol} \n entryprice :{instance.price} \n stoploss :{instance.stop_amount}"
-    print("user with uuid",users_with_uuid)
+    print("user with uuid", users_with_uuid)
+    data = {}
     for user in users_with_uuid:
         if user.auto_set_trade:
-            print("auto set trade",user)
-            
+            print("auto set trade", user)
+
             user_key = UserKey.objects.filter(user=user)
-            print("key user ",user_key)
+            print("key user ", user_key)
             if user_key:
                 print("thau ma aayo")
-                x = create_my_trade(instance,user,user_key[0])
+                x = create_my_trade(instance, user, user_key[0])
                 print(x)
+                message = "Your Trade has been executed we are updating the message."
+                data = {
+                    "chat_id": user.telegram_id,
+                    "text": message,
+                    "reply_markup": keyboard_json,
+                }
             else:
                 data = {
                     "chat_id": user.telegram_id,
@@ -62,8 +70,7 @@ def create_default_subscription(sender, instance, created, **kwargs):
         else:
             continue
 
-        # telegram ma exin manpathaula
-        # requests.post(reply_url, data=data)
+        requests.post(reply_url, data=data)
 
 
 @receiver(post_save, sender=TradeHistory)
