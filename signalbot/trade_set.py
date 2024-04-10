@@ -172,18 +172,18 @@ def create_my_trade(signal_obj, user, userkey):
     stop_price = signal_obj.stop_amount
     trade_side = "buy" if signal_obj.trade_type == "Buy/Long" else "sell"
     additional_params = {}
-    if price < round((price_now - price_now * 0.005), 4):
-        print(f"price can't be less than {round((price_now - price_now * 0.005), 4)}")
-        logging.info(
-            f"price can't be less than {round((price_now - price_now * 0.005), 4)}"
-        )
-        return f"price can't be less than {round((price_now - price_now * 0.005), 4)}"
-    elif price > round((price_now + price_now * 0.005), 4):
-        print(f"price can't be higher than {round((price_now + price_now * 0.005), 4)}")
-        logging.info(
-            f"price can't be higher than {round((price_now + price_now * 0.005), 4)}"
-        )
-        return f"price can't be higher than {round((price_now + price_now * 0.005), 4)}"
+    # if price < round((price_now - price_now * 0.005), 4):
+    #     print(f"price can't be less than {round((price_now - price_now * 0.005), 4)}")
+    #     logging.info(
+    #         f"price can't be less than {round((price_now - price_now * 0.005), 4)}"
+    #     )
+    #     return f"price can't be less than {round((price_now - price_now * 0.005), 4)}"
+    # elif price > round((price_now + price_now * 0.005), 4):
+    #     print(f"price can't be higher than {round((price_now + price_now * 0.005), 4)}")
+    #     logging.info(
+    #         f"price can't be higher than {round((price_now + price_now * 0.005), 4)}"
+    #     )
+    #     return f"price can't be higher than {round((price_now + price_now * 0.005), 4)}"
 
     if trade_side == "buy" and price < stop_price:
         return f"Stop loss cannot be higher than price"

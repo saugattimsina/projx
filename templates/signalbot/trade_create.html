@@ -1,11 +1,43 @@
-{% extends "base.html" %}
-{% load static %}
-{% block content %}
-<div class="card">
-<form method="post" style="padding-top: 5rem; padding-left:4rem;">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="font-size-40 mt-2 text-center">Create Signal</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-9 m-auto">
+                <div class="card m-auto">
+                    <div class="card m-10">
+                        <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                                <div class="mb-3 row m-auto">
+                                    <label for="{{ field.id_for_label }}" class="col-md-2 col-form-label">{{ field.label }}</label>
+                                    <div class="col-md-10">
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <div class="text-danger">
+                                                {% for error in field.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <div class="mb-3 row">
+                                <div class="col-4 m-auto">
+                                    <button type="submit" class="btn btn-info btn-rounded waves-effect waves-light">Submit</button>
+                                </div>
+                            </div>                       
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock content %}

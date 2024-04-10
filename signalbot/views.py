@@ -33,6 +33,9 @@ class TradeCreateView(CreateView):
     template_name = "signalbot/trade_create.html"
     success_url = "/"
 
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
 
 class TelegramWebhook(APIView):
     def post(self, request, token):
