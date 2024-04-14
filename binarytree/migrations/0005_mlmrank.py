@@ -6,17 +6,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('binarytree', '0004_alter_mlmbinary_name_alter_mlmbinary_parent_and_more'),
+        ("binarytree", "0004_alter_mlmbinary_name_alter_mlmbinary_parent_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MLMRank',
+            name="MLMRank",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=150)),
-                ('referrals', models.IntegerField()),
-                ('team_size', models.IntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=150)),
+                ("referrals", models.IntegerField()),
+                ("team_size", models.IntegerField()),
             ],
         ),
     ]

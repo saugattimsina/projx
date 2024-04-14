@@ -7,20 +7,27 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='TradeSignals',
+            name="TradeSignals",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('symbol', models.CharField(max_length=255)),
-                ('trade_side', models.CharField(max_length=255)),
-                ('position_amount', models.FloatField()),
-                ('leverage', models.FloatField()),
-                ('trailing_stop_percent', models.FloatField()),
-                ('take_profit_percent', models.FloatField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("symbol", models.CharField(max_length=255)),
+                ("trade_side", models.CharField(max_length=255)),
+                ("position_amount", models.FloatField()),
+                ("leverage", models.FloatField()),
+                ("trailing_stop_percent", models.FloatField()),
+                ("take_profit_percent", models.FloatField()),
             ],
         ),
     ]

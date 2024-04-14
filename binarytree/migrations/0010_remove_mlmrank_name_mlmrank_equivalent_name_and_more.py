@@ -6,22 +6,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('binarytree', '0009_alter_binaryparents_user'),
+        ("binarytree", "0009_alter_binaryparents_user"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='mlmrank',
-            name='name',
+            model_name="mlmrank",
+            name="name",
         ),
         migrations.AddField(
-            model_name='mlmrank',
-            name='equivalent_name',
-            field=models.CharField(choices=[('Unranked', 'Unranked'), ('Bronze', 'Bronze'), ('Silver', 'Silver'), ('Gold', 'Gold'), ('Platinum', 'Platinum'), ('Diamond', 'Diamond')], default='Unranked', max_length=25),
+            model_name="mlmrank",
+            name="equivalent_name",
+            field=models.CharField(
+                choices=[
+                    ("Unranked", "Unranked"),
+                    ("Bronze", "Bronze"),
+                    ("Silver", "Silver"),
+                    ("Gold", "Gold"),
+                    ("Platinum", "Platinum"),
+                    ("Diamond", "Diamond"),
+                ],
+                default="Unranked",
+                max_length=25,
+            ),
         ),
         migrations.AddField(
-            model_name='mlmrank',
-            name='rank_name',
+            model_name="mlmrank",
+            name="rank_name",
             field=models.CharField(blank=True, max_length=25, null=True),
         ),
     ]

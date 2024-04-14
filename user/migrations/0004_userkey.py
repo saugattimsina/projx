@@ -8,18 +8,32 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0003_user_telegram_id'),
+        ("user", "0003_user_telegram_id"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UserKey',
+            name="UserKey",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('api_key', models.CharField(max_length=255)),
-                ('api_secret', models.CharField(max_length=255)),
-                ('is_active', models.BooleanField(default=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("api_key", models.CharField(max_length=255)),
+                ("api_secret", models.CharField(max_length=255)),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

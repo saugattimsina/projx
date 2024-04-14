@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0013_user_is_connected_to_authunticator'),
+        ("user", "0013_user_is_connected_to_authunticator"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='auto_set_trade',
+            model_name="user",
+            name="auto_set_trade",
             field=models.BooleanField(default=False),
         ),
     ]

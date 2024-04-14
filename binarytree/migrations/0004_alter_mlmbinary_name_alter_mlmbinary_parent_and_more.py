@@ -9,28 +9,51 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('binarytree', '0003_alter_mlmbinary_parent'),
+        ("binarytree", "0003_alter_mlmbinary_parent"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='mlmbinary',
-            name='name',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL),
+            model_name="mlmbinary",
+            name="name",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='mlmbinary',
-            name='parent',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='parent_user', to='binarytree.mlmbinary'),
+            model_name="mlmbinary",
+            name="parent",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="parent_user",
+                to="binarytree.mlmbinary",
+            ),
         ),
         migrations.AlterField(
-            model_name='mlmbinary',
-            name='user_left',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='left', to='binarytree.mlmbinary'),
+            model_name="mlmbinary",
+            name="user_left",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="left",
+                to="binarytree.mlmbinary",
+            ),
         ),
         migrations.AlterField(
-            model_name='mlmbinary',
-            name='user_right',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='right', to='binarytree.mlmbinary'),
+            model_name="mlmbinary",
+            name="user_right",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="right",
+                to="binarytree.mlmbinary",
+            ),
         ),
     ]

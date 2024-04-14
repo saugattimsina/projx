@@ -7,14 +7,16 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('subscription', '0003_usersubpaymenthistory_has_partial_payment'),
+        ("subscription", "0003_usersubpaymenthistory_has_partial_payment"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='usersubcription',
-            name='created_on',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="usersubcription",
+            name="created_on",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
     ]

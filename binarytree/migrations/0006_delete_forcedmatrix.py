@@ -6,11 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('binarytree', '0005_forcedmatrix'),
+        ("binarytree", "0005_forcedmatrix"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='ForcedMatrix',
+            name="ForcedMatrix",
         ),
     ]

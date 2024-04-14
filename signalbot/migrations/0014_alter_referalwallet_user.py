@@ -9,13 +9,15 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('signalbot', '0013_remove_referalincome_is_withdrawn'),
+        ("signalbot", "0013_remove_referalincome_is_withdrawn"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='referalwallet',
-            name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="referalwallet",
+            name="user",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

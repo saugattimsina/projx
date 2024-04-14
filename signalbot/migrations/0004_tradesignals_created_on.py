@@ -7,14 +7,16 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('signalbot', '0003_remove_tradesignals_trade_side'),
+        ("signalbot", "0003_remove_tradesignals_trade_side"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tradesignals',
-            name='created_on',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="tradesignals",
+            name="created_on",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
     ]

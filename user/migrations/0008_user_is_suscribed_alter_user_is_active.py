@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0007_user_refered'),
+        ("user", "0007_user_refered"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='is_suscribed',
+            model_name="user",
+            name="is_suscribed",
             field=models.BooleanField(blank=True, default=False, null=True),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='is_active',
+            model_name="user",
+            name="is_active",
             field=models.BooleanField(blank=True, default=False, null=True),
         ),
     ]

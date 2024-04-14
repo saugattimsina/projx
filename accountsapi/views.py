@@ -7,8 +7,9 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.authentication import TokenAuthentication
+from django.contrib.auth.password_validation import validate_password
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -33,7 +34,8 @@ class UserLoginApiView(GenericAPIView):
     serializer_class = UserLoginSerializer
 
     @swagger_auto_schema(
-        responses={200: UserLoginSerializer}, operation_summary="Api for Login user"
+        responses={status.HTTP_200_OK: UserLoginSerializer},
+        operation_summary="Api for Login user",
     )
     def post(self, request, format=None):
         serializer = self.get_serializer(
@@ -55,7 +57,7 @@ class UserLoginApiView(GenericAPIView):
                         },
                         "message": "Login Successful. Proceed to 2FA",
                     },
-                    status=200,
+                    status=status.HTTP_200_OK,
                 )
             else:
                 return Response(
@@ -71,7 +73,7 @@ class UserLoginApiView(GenericAPIView):
                             },
                         },
                     },
-                    status=200,
+                    status=status.HTTP_200_OK,
                 )
         else:
             return Response(
@@ -151,23 +153,30 @@ class VerityOTPView(GenericAPIView):
 class ApiForUserBinanceKey(ModelViewSet):
     serializer_class = UserBinancyAPIKey
     authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(operation_summary="Api for saving user binance api key")
     def create(self, request, *args, **kwargs):
-        user = request.user
-        serializer = UserBinancyAPIKey(data=request.data)
-        serializer.is_valid(raise_exception=True)
         try:
-            key = UserKey.objects.get(user=user, is_active=True)
-            key.is_active = False
-            key.save()
-        except:
-            print("no previous key")
-        serializer.save(user=user)
-        return Response(
-            {"message": "save key successfully", "success": True},
-            status=status.HTTP_200_OK,
-        )
+            user = request.user
+            serializer = UserBinancyAPIKey(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            try:
+                key = UserKey.objects.get(user=user, is_active=True)
+                key.is_active = False
+                key.save()
+            except:
+                print("no previous key")
+            serializer.save(user=user)
+            return Response(
+                {"message": "save key successfully", "success": True},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"message": str(e), "success": False},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     @swagger_auto_schema(operation_summary="Api for updating user binance api key")
     def update(self, request, *args, **kwargs):
@@ -205,8 +214,7 @@ class LogoutApiView(APIView):
         token.delete()
         token = Token.objects.create(user=token.user)
         return Response(
-            {"message": "Logout success", "success": True},
-            status=status.HTTP_200_OK,
+            {"message": "Logout success", "success": True}, status=status.HTTP_200_OK
         )
 
 
@@ -278,27 +286,39 @@ class ResetPasswordAPIView(APIView):
                 ),
             },
         ),
-        operation_summary="Api for Changing password",
+        operation_summary="Api for forget password",
     )
     def post(self, request, user_id):
         new_password = request.data.get("new_password")
         try:
             user = User.objects.get(id=user_id)
-            user.set_password(new_password)
-            user.save()
+            if user.email_otp_verified:
+                validate_password(new_password)
+                user.set_password(new_password)
+                user.email_otp_verified = False
+                user.save()
+                return Response(
+                    {"message": "Password changed successfully", "success": True},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"message": "Please verify the email", "success": True},
+                    status=status.HTTP_200_OK,
+                )
+        except Exception as e:
             return Response(
-                {"message": "Password changed successfully", "success": True},
-                status=status.HTTP_200_OK,
+                {"message": e, "success": False},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        except User.DoesNotExist:
-            return Response({"message": "User not found", "success": False}, status=404)
 
 
 class ChangeUserPasswordAPIView(GenericAPIView):
     serializer_class = ChangePasswordSerializer
     authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(operation_summary="Api for updating user password")
+    @swagger_auto_schema(operation_summary="Api for change user password")
     def post(self, request, user_id):
         serializer = ChangePasswordSerializer(data=request.data)
         try:

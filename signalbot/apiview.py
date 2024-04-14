@@ -487,9 +487,8 @@ class ShowPositions(APIView):
             )
 
 
-
 class TradeView(APIView):
     authentication_classes = [TokenAuthentication]
-    
+
     def get(self, request, *args, **kwargs):
         pass

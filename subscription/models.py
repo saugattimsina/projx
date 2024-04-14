@@ -2,14 +2,20 @@ from django.db import models
 from ckeditor.fields import RichTextField
 from user.models import User
 
+
 # Create your models here.
 class Subscription(models.Model):
     package_name = models.CharField(max_length=255)
     price = models.FloatField()
     time_in_days = models.CharField(max_length=5)
-    time_in_months = models.CharField(max_length=5,null=True,blank=True)
+    time_in_months = models.CharField(max_length=5, null=True, blank=True)
     description = RichTextField()
-    package_type= models.CharField(choices=(("paid",'paid'),("free","free")),max_length=255,blank=True,null=True)
+    package_type = models.CharField(
+        choices=(("paid", "paid"), ("free", "free")),
+        max_length=255,
+        blank=True,
+        null=True,
+    )
 
 
 class SubscriptionDetail(models.Model):
@@ -53,6 +59,8 @@ class UserSubPaymentHistory(models.Model):
         null=True,
     )
     payment_id = models.CharField(max_length=500, null=True, blank=True, unique=True)
-    remaining_amount = models.DecimalField(blank=True, decimal_places=4, max_digits=19, null=True)
+    remaining_amount = models.DecimalField(
+        blank=True, decimal_places=4, max_digits=19, null=True
+    )
     payment_status = models.CharField(max_length=100, null=True, blank=True)
     has_partial_payment = models.BooleanField(default=False)

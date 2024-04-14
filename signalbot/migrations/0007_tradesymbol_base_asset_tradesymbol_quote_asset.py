@@ -6,19 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('signalbot', '0006_tradesymbol_alter_tradesignals_symbol'),
+        ("signalbot", "0006_tradesymbol_alter_tradesignals_symbol"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tradesymbol',
-            name='base_asset',
+            model_name="tradesymbol",
+            name="base_asset",
             field=models.CharField(default=1, max_length=255),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='tradesymbol',
-            name='quote_asset',
+            model_name="tradesymbol",
+            name="quote_asset",
             field=models.CharField(default=1, max_length=255),
             preserve_default=False,
         ),

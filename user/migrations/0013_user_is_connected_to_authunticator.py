@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0012_user_is_first_month'),
+        ("user", "0012_user_is_first_month"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='is_connected_to_authunticator',
+            model_name="user",
+            name="is_connected_to_authunticator",
             field=models.BooleanField(default=False),
         ),
     ]

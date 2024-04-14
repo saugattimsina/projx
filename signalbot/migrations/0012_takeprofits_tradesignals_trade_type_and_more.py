@@ -6,36 +6,51 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('signalbot', '0011_referalwithdrawlhistory_referalwallet_referalincome_and_more'),
+        (
+            "signalbot",
+            "0011_referalwithdrawlhistory_referalwallet_referalincome_and_more",
+        ),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TakeProfits',
+            name="TakeProfits",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.FloatField()),
-                ('percentage', models.FloatField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("amount", models.FloatField()),
+                ("percentage", models.FloatField()),
             ],
         ),
         migrations.AddField(
-            model_name='tradesignals',
-            name='trade_type',
-            field=models.CharField(choices=[('Buy/Long', 'Buy/Long'), ('Sell/Short', 'Sell/Short')], default=1, max_length=50),
+            model_name="tradesignals",
+            name="trade_type",
+            field=models.CharField(
+                choices=[("Buy/Long", "Buy/Long"), ("Sell/Short", "Sell/Short")],
+                default=1,
+                max_length=50,
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='tradehistory',
-            name='trade_id',
+            model_name="tradehistory",
+            name="trade_id",
             field=models.CharField(blank=True, max_length=255, null=True, unique=True),
         ),
         migrations.RemoveField(
-            model_name='tradesignals',
-            name='take_profit_amount',
+            model_name="tradesignals",
+            name="take_profit_amount",
         ),
         migrations.AddField(
-            model_name='tradesignals',
-            name='take_profit_amount',
-            field=models.ManyToManyField(to='signalbot.takeprofits'),
+            model_name="tradesignals",
+            name="take_profit_amount",
+            field=models.ManyToManyField(to="signalbot.takeprofits"),
         ),
     ]

@@ -57,7 +57,9 @@ class MLMBinary(MP_Node):
 
 
 class MLMRank(models.Model):
-    rank_image = models.ImageField(upload_to="uploads/ranks/%Y/%m/%d/", null=True, blank=True)
+    rank_image = models.ImageField(
+        upload_to="uploads/ranks/%Y/%m/%d/", null=True, blank=True
+    )
     rank_choice = (
         ("Unranked", "Unranked"),
         ("Bronze", "Bronze"),

@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('binarytree', '0011_alter_binaryparents_parents'),
+        ("binarytree", "0011_alter_binaryparents_parents"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='mlmrank',
-            name='rank_image',
-            field=models.ImageField(blank=True, null=True, upload_to='uploads/ranks/%Y/%m/%d/'),
+            model_name="mlmrank",
+            name="rank_image",
+            field=models.ImageField(
+                blank=True, null=True, upload_to="uploads/ranks/%Y/%m/%d/"
+            ),
         ),
     ]

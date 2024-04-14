@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('subscription', '0002_usersubpaymenthistory_remaining_amount'),
+        ("subscription", "0002_usersubpaymenthistory_remaining_amount"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='usersubpaymenthistory',
-            name='has_partial_payment',
+            model_name="usersubpaymenthistory",
+            name="has_partial_payment",
             field=models.BooleanField(default=False),
         ),
     ]

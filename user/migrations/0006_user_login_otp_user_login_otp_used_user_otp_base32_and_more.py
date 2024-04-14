@@ -6,38 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0005_alter_user_telegram_id'),
+        ("user", "0005_alter_user_telegram_id"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='login_otp',
+            model_name="user",
+            name="login_otp",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='login_otp_used',
+            model_name="user",
+            name="login_otp_used",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='otp_base32',
+            model_name="user",
+            name="otp_base32",
             field=models.CharField(max_length=255, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='otp_created_at',
+            model_name="user",
+            name="otp_created_at",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='otpauth_url',
+            model_name="user",
+            name="otpauth_url",
             field=models.CharField(blank=True, max_length=225, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='qr_code',
-            field=models.ImageField(blank=True, null=True, upload_to='qrcode/'),
+            model_name="user",
+            name="qr_code",
+            field=models.ImageField(blank=True, null=True, upload_to="qrcode/"),
         ),
     ]

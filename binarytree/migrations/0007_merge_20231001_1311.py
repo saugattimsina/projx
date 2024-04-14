@@ -6,9 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('binarytree', '0006_delete_forcedmatrix'),
-        ('binarytree', '0006_remove_mlmrank_referrals_remove_mlmrank_team_size_and_more'),
+        ("binarytree", "0006_delete_forcedmatrix"),
+        (
+            "binarytree",
+            "0006_remove_mlmrank_referrals_remove_mlmrank_team_size_and_more",
+        ),
     ]
 
-    operations = [
-    ]
+    operations = []

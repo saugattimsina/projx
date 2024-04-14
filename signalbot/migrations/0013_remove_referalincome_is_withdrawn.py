@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('signalbot', '0012_alter_tradehistory_trade_id'),
+        ("signalbot", "0012_alter_tradehistory_trade_id"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='referalincome',
-            name='is_withdrawn',
+            model_name="referalincome",
+            name="is_withdrawn",
         ),
     ]

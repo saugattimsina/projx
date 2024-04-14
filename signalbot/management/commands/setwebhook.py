@@ -5,7 +5,6 @@ from django.core.management import BaseCommand
 from django.urls import reverse
 
 
-
 class Command(BaseCommand):
     help = "Set new telegram webhook"
 
@@ -14,11 +13,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         root_url = options["root_url"]
-        webhook_path = reverse("signalbot:telegram_webhook", kwargs={"token": settings.TELEGRAM_WEBHOOK_TOKEN})
+        webhook_path = reverse(
+            "signalbot:telegram_webhook",
+            kwargs={"token": settings.TELEGRAM_WEBHOOK_TOKEN},
+        )
 
         webhook_url = f"{root_url}{webhook_path}"
 
-        set_webhook_api = f"https://api.telegram.org/bot{settings.TELEGRAM_API_TOKEN}/setWebhook"
+        set_webhook_api = (
+            f"https://api.telegram.org/bot{settings.TELEGRAM_API_TOKEN}/setWebhook"
+        )
 
         self.stdout.write(f"Setting webhook url {webhook_url}\n")
 

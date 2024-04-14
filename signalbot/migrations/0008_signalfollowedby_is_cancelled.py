@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('signalbot', '0007_tradesymbol_base_asset_tradesymbol_quote_asset'),
+        ("signalbot", "0007_tradesymbol_base_asset_tradesymbol_quote_asset"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='signalfollowedby',
-            name='is_cancelled',
+            model_name="signalfollowedby",
+            name="is_cancelled",
             field=models.BooleanField(default=False),
         ),
     ]

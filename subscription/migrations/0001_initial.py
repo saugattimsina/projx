@@ -16,48 +16,136 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Subscription',
+            name="Subscription",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('package_name', models.CharField(max_length=255)),
-                ('price', models.FloatField()),
-                ('time_in_days', models.CharField(max_length=5)),
-                ('description', ckeditor.fields.RichTextField()),
-                ('package_type', models.CharField(blank=True, choices=[('paid', 'paid'), ('free', 'free')], max_length=255, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("package_name", models.CharField(max_length=255)),
+                ("price", models.FloatField()),
+                ("time_in_days", models.CharField(max_length=5)),
+                ("description", ckeditor.fields.RichTextField()),
+                (
+                    "package_type",
+                    models.CharField(
+                        blank=True,
+                        choices=[("paid", "paid"), ("free", "free")],
+                        max_length=255,
+                        null=True,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='UserSubPaymentHistory',
+            name="UserSubPaymentHistory",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_transaction', models.DateTimeField(verbose_name='transaction date')),
-                ('amount', models.DecimalField(blank=True, decimal_places=4, max_digits=19, null=True)),
-                ('payment_id', models.CharField(blank=True, max_length=500, null=True, unique=True)),
-                ('payment_status', models.CharField(blank=True, max_length=100, null=True)),
-                ('subscription', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='subscription.subscription')),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "date_transaction",
+                    models.DateTimeField(verbose_name="transaction date"),
+                ),
+                (
+                    "amount",
+                    models.DecimalField(
+                        blank=True, decimal_places=4, max_digits=19, null=True
+                    ),
+                ),
+                (
+                    "payment_id",
+                    models.CharField(
+                        blank=True, max_length=500, null=True, unique=True
+                    ),
+                ),
+                (
+                    "payment_status",
+                    models.CharField(blank=True, max_length=100, null=True),
+                ),
+                (
+                    "subscription",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="subscription.subscription",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='UserSubcription',
+            name="UserSubcription",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('start_date', models.DateTimeField(auto_now_add=True)),
-                ('end_date', models.DateTimeField(blank=True, null=True)),
-                ('plan', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='subscription.subscription')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("start_date", models.DateTimeField(auto_now_add=True)),
+                ("end_date", models.DateTimeField(blank=True, null=True)),
+                (
+                    "plan",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="subscription.subscription",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-start_date'],
+                "ordering": ["-start_date"],
             },
         ),
         migrations.CreateModel(
-            name='SubscriptionDetail',
+            name="SubscriptionDetail",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('feature', models.CharField(max_length=255)),
-                ('is_available', models.BooleanField(default=False)),
-                ('related_to', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='subscription.subscription')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("feature", models.CharField(max_length=255)),
+                ("is_available", models.BooleanField(default=False)),
+                (
+                    "related_to",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="subscription.subscription",
+                    ),
+                ),
             ],
         ),
     ]

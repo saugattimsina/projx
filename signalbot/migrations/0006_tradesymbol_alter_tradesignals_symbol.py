@@ -7,20 +7,30 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('signalbot', '0005_signalfollowedby'),
+        ("signalbot", "0005_signalfollowedby"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TradeSymbol',
+            name="TradeSymbol",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('symbol', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("symbol", models.CharField(max_length=255)),
             ],
         ),
         migrations.AlterField(
-            model_name='tradesignals',
-            name='symbol',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='signalbot.tradesymbol'),
+            model_name="tradesignals",
+            name="symbol",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="signalbot.tradesymbol"
+            ),
         ),
     ]
