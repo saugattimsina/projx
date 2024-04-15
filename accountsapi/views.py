@@ -16,8 +16,10 @@ from drf_yasg import openapi
 
 from user.models import UserKey
 from accountsapi.utils import generate_otp, send_otp_email
-
+from utils.custom_response import SuccessResponse, FailedResponse
 from .serializers import (
+    PasswordResetConfirmSerializer,
+    PasswordResetSerializer,
     UserLoginSerializer,
     UserSerializer,
     RegistrationSerializer,
@@ -53,6 +55,7 @@ class UserLoginApiView(GenericAPIView):
                         "success": True,
                         "data": {
                             "user_id": user.id,
+                            "user_uid": user.user_uuid,
                             # "username": user.username,
                         },
                         "message": "Login Successful. Proceed to 2FA",
@@ -66,9 +69,7 @@ class UserLoginApiView(GenericAPIView):
                         "data": {
                             "user": {
                                 "user_id": user.id,
-                                # "username": user.username,
-                                # "image": user.image.path if user.image else None,
-                                # "is_client": user.is_client,
+                                "user_uid": user.user_uuid,
                                 "qr_code": user.qr_code.url,
                             },
                         },
@@ -102,6 +103,7 @@ class UserRegistrationApiView(GenericAPIView):
                         # "token": token.key,
                         "user": {
                             "user_id": user.id,
+                            "user_uid": user.user_uuid,
                             # "username": user.username,
                             # "image": user.image.path if user.image else None,
                             # "is_client": user.is_client,
@@ -126,8 +128,8 @@ class VerityOTPView(GenericAPIView):
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            user_id = serializer.validated_data["user_id"]
-            user = User.objects.filter(id=user_id).first()
+            user_uid = serializer.validated_data["user_uid"]
+            user = User.objects.get(user_uuid=user_uid)
             if not user.is_connected_to_authunticator:
                 user.is_connected_to_authunticator = True
                 user.save()
@@ -274,43 +276,38 @@ class ValidateEmailOTP(APIView):
             return Response({"message": "User not found", "success": False}, status=404)
 
 
-class ResetPasswordAPIView(APIView):
-    authentication_classes = [TokenAuthentication]
+class ResetPasswordAPIView(GenericAPIView):
+    serializer_class = PasswordResetSerializer
 
-    @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "new_password": openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                ),
-            },
-        ),
-        operation_summary="Api for forget password",
-    )
-    def post(self, request, user_id):
-        new_password = request.data.get("new_password")
+    @swagger_auto_schema(operation_summary="Api for reset user password")
+    def post(self, request):
         try:
-            user = User.objects.get(id=user_id)
-            if user.email_otp_verified:
-                validate_password(new_password)
-                user.set_password(new_password)
-                user.email_otp_verified = False
-                user.save()
-                return Response(
-                    {"message": "Password changed successfully", "success": True},
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                return Response(
-                    {"message": "Please verify the email", "success": True},
-                    status=status.HTTP_200_OK,
-                )
-        except Exception as e:
-            return Response(
-                {"message": e, "success": False},
-                status=status.HTTP_400_BAD_REQUEST,
+            serializers = PasswordResetSerializer(
+                data=request.data, context={"request": request}
             )
+            if serializers.is_valid():
+                serializers.save()
+                return SuccessResponse(message="Password reset email send", data=[])
+            else:
+                return FailedResponse(message=serializers.errors)
+        except Exception as e:
+            return FailedResponse(message=str(e))
+
+
+class PasswordResetConfirmAPIView(GenericAPIView):
+    serializer_class = PasswordResetConfirmSerializer
+
+    @swagger_auto_schema(operation_summary="Api for conform reset user password")
+    def post(self, request):
+        try:
+            serializer = self.serializer_class(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return SuccessResponse(message="Password reset Successfully", data=[])
+            else:
+                return FailedResponse(message=serializer.errors)
+        except Exception as e:
+            return FailedResponse(message=str(e))
 
 
 class ChangeUserPasswordAPIView(GenericAPIView):
@@ -319,22 +316,18 @@ class ChangeUserPasswordAPIView(GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(operation_summary="Api for change user password")
-    def post(self, request, user_id):
+    def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
         try:
-            user = User.objects.get(id=user_id)
+            user = request.user
             if serializer.is_valid():
                 if user.check_password(serializer.data.get("old_password")):
                     user.set_password(serializer.data.get("new_password"))
                     user.save()
-                    return Response(
-                        {"message": "Password changed successfully."},
-                        status=status.HTTP_200_OK,
+                    return SuccessResponse(
+                        message="Password changed successfully.", data=[]
                     )
-                return Response(
-                    {"error": "Incorrect old password."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
-            return Response({"message": "User not found", "success": False}, status=404)
+                return FailedResponse(message="Incorrect old password")
+            return FailedResponse(message=serializer.errors)
+        except Exception as e:
+            return FailedResponse(message=str(e))

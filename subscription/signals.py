@@ -76,7 +76,16 @@ be added tooo first need to finish the binary model
 def create_default_subscription(sender, instance, created, **kwargs):
     if created:
         if not instance.is_superuser:
-            default_subscription = Subscription.objects.get(package_type="free")
+            try:
+                default_subscription = Subscription.objects.get(package_type="free")
+            except Subscription.DoesNotExist:
+                default_subscription = Subscription.objects.create(
+                    package_type="free",
+                    price=0,
+                    time_in_days=365,
+                    time_in_months=12,
+                    package_name="Free",
+                )
             if default_subscription:
                 UserSubcription.objects.create(user=instance, plan=default_subscription)
         if instance.is_superuser:

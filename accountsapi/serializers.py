@@ -21,6 +21,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from subscription.models import UserSubcription
 from binarytree.models import MLMRank, UserRank
 import ccxt
+from .utils import generate_otp, send_otp_email
 
 User = get_user_model()
 
@@ -45,24 +46,18 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate(self, attrs: dict):
-        print(attrs.get("username"))
-        print(attrs.get("password"))
         user = authenticate(
-            # request=self.context.get("request"),
             username=attrs.get("username"),
             password=attrs.get("password"),
         )
-        print(user)
-
         if user is None:
             raise exceptions.AuthenticationFailed("Invalid login details.")
         else:
             attrs["user_object"] = user
         return super().validate(attrs)
 
-    def create(self, validated_data: dict):
-        user: User = validated_data.get("user_object")
-        print(user)
+    def create(self, validated_data):
+        user = validated_data.get("user_object")
         totp = pyotp.TOTP(user.otp_base32).now()
         user.login_otp = totp
         user.otp_created_at = datetime.now(timezone.utc)
@@ -92,76 +87,53 @@ class RegistrationSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {"password": {"write_only": True}}
 
-    # def validate_image(self, value):
-    #     # Check if the uploaded image is greater than 2 MB (2 * 1024 * 1024 bytes)
-    #     if value.size > 2 * 1024 * 1024:
-    #         raise serializers.ValidationError(_("Image size should not exceed 2 MB."))
-    #     return value
+    def validate(self, data):
+        # Check passwords match
+        if data["password"] != data["confirm_password"]:
+            raise serializers.ValidationError({"password": ["Passwords must match."]})
 
-    def validate_password(self, value):
-        # Use Django's built-in password validation to check password strength
+        # Password strength validation
         try:
-            validate_password(value)
+            validate_password(data["password"])
         except ValidationError as e:
-            raise serializers.ValidationError(e.messages)
+            raise serializers.ValidationError({"password": list(e.messages)})
 
-        return value
-
-    def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
+        # Email uniqueness validation
+        if User.objects.filter(email=data["email"]).exists():
             raise serializers.ValidationError(
-                {
-                    "email": "This email is already registered.",
-                }
+                {"email": ["This email is already registered."]}
             )
-        return value
+
+        return data
 
     def create(self, validated_data):
-        password = validated_data["password"]
-        password2 = validated_data["confirm_password"]
-        if password != password2:
-            raise serializers.ValidationError(
-                {
-                    "message": {"password": "Passwords must match."},
-                    "success": False,
-                }
-            )
-
-        email = validated_data["email"]
-        self.validate_email(email)
+        validated_data.pop("confirm_password", None)
         try:
             refered = User.objects.get(username=validated_data["referal"])
         except Exception as e:
             raise serializers.ValidationError("unknown referal")
-
-        # Create the user instance without custom fields
-        user = User(username=validated_data["username"], email=validated_data["email"])
-        # user.image = validated_data["image"]
-        user.name = validated_data["name"]
-        user.set_password(password)
-        # user.telegram_id = validated_data["telegram_id"]
-        # print(validated_data["refered"])
-        user.refered = refered
-        # print(refered)
+        validated_data.pop("referal", None)
+        user = User(**validated_data)
+        user.set_password(validated_data["password"])
         user.is_client = True
-        # Save the user instance with custom fields
+        user.refered = refered
+        user.full_clean()  # This will run all model-level validations
         user.save()
-
         return user
 
 
 class VerifyOTPSerializer(serializers.Serializer):
     otp = serializers.CharField(required=True)
-    user_id = serializers.IntegerField(required=True)
+    user_uid = serializers.CharField(required=True)
 
-    def validate(self, attrs: dict):
-        user: User = User.objects.filter(id=attrs.get("user_id")).first()
-        if not user:
-            raise serializers.ValidationError("user id is wrong")
+    def validate(self, attrs):
+        try:
+            user = User.objects.get(user_uuid=attrs["user_uid"])
+        except User.DoesNotExist:
+            raise serializers.ValidationError("user uid is invalid")
 
         if attrs.get("otp") != user.login_otp or not user.is_valid_otp():
             totp = pyotp.TOTP(user.otp_base32).now()
-            print("otp", totp)
             user.login_otp = totp
             user.otp_created_at = datetime.now(timezone.utc)
             user.login_otp_used = False
@@ -174,8 +146,8 @@ class VerifyOTPSerializer(serializers.Serializer):
         attrs["user"] = user
         return super().validate(attrs)
 
-    def create(self, validated_data: dict):
-        user: User = validated_data.get("user")
+    def create(self, validated_data):
+        user = validated_data.get("user")
         token = Token.objects.get(user=user)
         user.login_otp_used = True
         user.save(update_fields=["login_otp_used"])
@@ -245,3 +217,49 @@ class UserBinancyAPIKey(serializers.ModelSerializer):
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        try:
+            user = User.objects.get(email=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User with this email does not exist.")
+        return user
+
+    def save(self):
+        user = self.validated_data["email"]
+        otp = generate_otp()
+        send_otp_email(user=user, otp=otp)
+        user.email_otp = otp
+        user.save()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True)
+    token = serializers.CharField(write_only=True)
+    uid = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        try:
+            uid = attrs["uid"]
+            print(uid)
+            user = User.objects.get(user_uuid=uid)
+            if user.email_otp != attrs["token"]:
+                raise Exception()
+        except User.DoesNotExist:
+            raise Exception("Invalid UID")
+        except:
+            raise Exception("Invalid Token")
+        validate_password(attrs["password"], user=user)
+        attrs["user"] = user
+        return attrs
+
+    def save(self):
+        password = self.validated_data["password"]
+        user = self.validated_data["user"]
+        user.set_password(password)
+        user.email_otp = None
+        user.save()

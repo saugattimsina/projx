@@ -9,6 +9,7 @@ from .views import (
     SendOTPForPasswordForget,
     ValidateEmailOTP,
     ResetPasswordAPIView,
+    PasswordResetConfirmAPIView,
     ChangeUserPasswordAPIView,
 )
 
@@ -20,8 +21,9 @@ urlpatterns = [
     path("verify/otp/", VerityOTPView.as_view()),
     path("add/key/", ApiForUserBinanceKey.as_view({"post": "create"})),
     path("update/key/", ApiForUserBinanceKey.as_view({"put": "update"})),
-    path("send/email/otp/<int:user_id>/", SendOTPForPasswordForget.as_view()),
-    path("verify/email/otp/<int:user_id>/", ValidateEmailOTP.as_view()),
-    path("change/password/<int:user_id>/", ChangeUserPasswordAPIView.as_view()),
-    path("reset/password/<int:user_id>/", ResetPasswordAPIView.as_view()),
+    # path("send/email/otp/<int:user_id>/", SendOTPForPasswordForget.as_view()),
+    # path("verify/email/otp/<int:user_id>/", ValidateEmailOTP.as_view()),
+    path("change/password/", ChangeUserPasswordAPIView.as_view()),
+    path("password-reset/", ResetPasswordAPIView.as_view()),
+    path("password-reset-confirm/", PasswordResetConfirmAPIView.as_view()),
 ]

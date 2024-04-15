@@ -3,7 +3,7 @@ from binarytree.models import MLMBinary, MLMMember, UserRank, MLMRank
 from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
 from user.models import User
 from subscription.models import UserSubcription
 
@@ -12,6 +12,7 @@ from subscription.models import UserSubcription
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
+from utils.custom_response import SuccessResponse, FailedResponse
 
 
 def get_descendants_up_to_2_levels(node):
@@ -37,38 +38,36 @@ def get_descendants_up_to_2_levels(node):
 
 class GetMYParentandChildren(APIView):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, user_id):
+    def get(self, request):
         try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            return Response({"error": "User not found", "success": False}, status=404)
-        x = MLMMember.objects.get(user=user)
-        y = MLMBinary.objects.get(name=user)
-        descendants_binary = get_descendants_up_to_2_levels(y)
-        enrollment_tree_user = [
-            {
-                "user": child.user.username,
-                "user_id": child.user.id,
-                "user_rank": UserRank.objects.get(user=child.user).rank.equivalent_name,
-                "user_rank_image": UserRank.objects.get(
-                    user=child.user
-                ).rank.rank_image.url,
-            }
-            for child in x.get_children()
-        ]
-
-        return Response(
-            {
-                "message": "Fetched tree of user",
-                "data": {
+            user = request.user
+            x = MLMMember.objects.get(user=user)
+            y = MLMBinary.objects.get(name=user)
+            descendants_binary = get_descendants_up_to_2_levels(y)
+            enrollment_tree_user = [
+                {
+                    "user": child.user.username,
+                    "user_id": child.user.id,
+                    "user_rank": UserRank.objects.get(
+                        user=child.user
+                    ).rank.equivalent_name,
+                    "user_rank_image": UserRank.objects.get(
+                        user=child.user
+                    ).rank.rank_image.url,
+                }
+                for child in x.get_children()
+            ]
+            return SuccessResponse(
+                message="Fetched tree of user",
+                data={
                     "binary_tree": descendants_binary,
                     "enrollment_tree": enrollment_tree_user,
                 },
-                "success": True,
-            },
-            status=status.HTTP_200_OK,
-        )
+            )
+        except Exception as e:
+            return FailedResponse(message=str(e))
 
 
 class GetUserRankApiView(APIView):

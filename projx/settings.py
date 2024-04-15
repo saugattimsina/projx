@@ -211,6 +211,11 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+FRONTEND_URL = os.environ.get("FRONTEND_URL")
+
+TEMPLATED_EMAIL_BACKEND = "templated_email.backends.vanilla_django"
+TEMPLATED_EMAIL_TEMPLATE_DIR = "email/"
+TEMPLATED_EMAIL_FILE_EXTENSION = "html.j2"
 
 LOGGING = {
     "version": 1,
