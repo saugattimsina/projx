@@ -74,6 +74,8 @@ def get_open_orders(user, api_key, api_secret, symbol):
                         "side": order["side"],
                         "price": order["price"],
                         "amount": order["amount"],
+                        "filled": order["filled"],
+                        "remaining": order["remaining"],
                     }
                 )
                 # print(f"Order ID: {order['id']}, Status: {order['status']} ,Type: {order['type']}, Side: {order['side']}, Price: {order['price']}, Amount: {order['amount']}]")
