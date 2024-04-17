@@ -75,12 +75,12 @@ urlpatterns = [
     path("binary/", include("binarytree.urls")),
     path("", include("accounts.urls")),
     path("a/", include("binarytree.urls")),
-    path("trade/", include("signalbot.urls")),
+    # path("trade/", include("signalbot.urls")),
     # path('telegram/', django_telethon_urls()),
     # api
     path("api/account/", include("accountsapi.urls")),
     path("api/binary/", include("binarytreeapi.urls")),
-    path("api/income/", include("signalbot.apiurls")),
+    path("income/", include("signalbot.apiurls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 import ccxt
 from django.db.models import Sum
@@ -64,8 +65,6 @@ def get_open_orders(user, api_key, api_secret, symbol):
         open_orders = exchange.fetch_open_orders(symbol=symbol)
         if open_orders:
             for order in open_orders:
-                print(order)
-                # print(order)
                 data.append(
                     {
                         "symbol": symbol,
@@ -93,12 +92,9 @@ class OpenOrders(APIView):
     def get(self, request, format=None):
         # print(request.user)
         user_key = UserKey.objects.filter(user=request.user).first()
-        three_days_ago = datetime.now() - timedelta(days=30)
         if user_key:
             symbols = (
-                SignalFollowedBy.objects.filter(
-                    user=user_key.user, created_on__gte=three_days_ago
-                )
+                SignalFollowedBy.objects.filter(user=user_key.user)
                 .values_list("signal__symbol__symbol", flat=True)
                 .distinct()
             )
@@ -284,65 +280,74 @@ def create_new_history(user):
 
 
 #         return Response(serializer.data, status=200)
+# class TradeHistoryView(ReadOnlyModelViewSet):
+#     authentication_classes = [TokenAuthentication]
+#     permission_classes = [IsAuthenticated]
+#     serializer_class = TradesHistorySerializer
+
+#     def get_queryset(self):
+#         return TradeHistory.objects.filter(user=self.request.user).order_by(
+#             "created_on"
+#         )
 
 
-class TradeHistoryView(ListAPIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-    serializer_class = TradesHistorySerializer
-    pagination_class = PageNumberPagination
+# class TradeHistoryView(ListAPIView):
+#     authentication_classes = [TokenAuthentication]
+#     permission_classes = [IsAuthenticated]
+#     serializer_class = TradesHistorySerializer
+#     pagination_class = PageNumberPagination
 
-    def get_queryset(self):
-        return TradeHistory.objects.filter(user=self.request.user).order_by(
-            "created_on"
-        )
+#     def get_queryset(self):
+#         return TradeHistory.objects.filter(user=self.request.user).order_by(
+#             "created_on"
+#         )
 
-    @swagger_auto_schema(
-        operation_summary=" Get list of Trade history",
-        paginator_class=PaginatorInspector,
-        manual_parameters=[
-            # Add pagination parameters to the manual_parameters list
-            openapi.Parameter(
-                "page",
-                openapi.IN_QUERY,
-                description="Page number",
-                type=openapi.TYPE_INTEGER,
-            ),
-        ],
-    )
-    def get(self, request, starting_date=None, ending_date=None, *args, **kwargs):
-        trade_data = create_new_history(request.user)
-        if trade_data == False:
-            return Response(
-                {"data": [], "message": "Update Your API key and secret"},
-                status=status.HTTP_204_NO_CONTENT,
-            )
-        if starting_date and ending_date:
-            start_date = parse_date(starting_date)
-            print(start_date)
-            end_date = parse_date(ending_date)
-            query = TradeHistory.objects.filter(
-                user=self.request.user,
-                created_on__date__gte=start_date,
-                created_on__date__lte=end_date,
-            ).order_by("-created_on")
-        else:
-            query = TradeHistory.objects.filter(user=self.request.user).order_by(
-                "-created_on"
-            )
-        serializer = self.get_serializer(query, many=True)
-        queryset = self.filter_queryset(query)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(
-                {
-                    "message": "user trade history",
-                    "sucess": True,
-                    "data": serializer.data,
-                },
-            )
-        return Response(serializer.data)
+#     @swagger_auto_schema(
+#         operation_summary=" Get list of Trade history",
+#         paginator_class=PaginatorInspector,
+#         manual_parameters=[
+#             # Add pagination parameters to the manual_parameters list
+#             openapi.Parameter(
+#                 "page",
+#                 openapi.IN_QUERY,
+#                 description="Page number",
+#                 type=openapi.TYPE_INTEGER,
+#             ),
+#         ],
+#     )
+#     def get(self, request, starting_date=None, ending_date=None, *args, **kwargs):
+#         trade_data = create_new_history(request.user)
+#         if trade_data == False:
+#             return Response(
+#                 {"data": [], "message": "Update Your API key and secret"},
+#                 status=status.HTTP_204_NO_CONTENT,
+#             )
+#         if starting_date and ending_date:
+#             start_date = parse_date(starting_date)
+#             print(start_date)
+#             end_date = parse_date(ending_date)
+#             query = TradeHistory.objects.filter(
+#                 user=self.request.user,
+#                 created_on__date__gte=start_date,
+#                 created_on__date__lte=end_date,
+#             ).order_by("-created_on")
+#         else:
+#             query = TradeHistory.objects.filter(user=self.request.user).order_by(
+#                 "-created_on"
+#             )
+#         serializer = self.get_serializer(query, many=True)
+#         queryset = self.filter_queryset(query)
+#         page = self.paginate_queryset(queryset)
+#         if page is not None:
+#             serializer = self.get_serializer(page, many=True)
+#             return self.get_paginated_response(
+#                 {
+#                     "message": "user trade history",
+#                     "sucess": True,
+#                     "data": serializer.data,
+#                 },
+#             )
+#         return Response(serializer.data)
 
 
 class ReferalIncomeHistoryAPIView(ModelViewSet):
@@ -443,7 +448,7 @@ class ShowPositions(APIView):
 
     @swagger_auto_schema(
         responses={200: TradesHistorySerializer()},
-        operation_summary="Test user history",
+        operation_summary="user history",
     )
     def get(self, request):
         user_key = UserKey.objects.filter(user=request.user).first()
@@ -460,29 +465,44 @@ class ShowPositions(APIView):
             balance = exchange.fetch_balance()
             positions = balance["info"]["positions"]
             user_positions = []
-            # print(positions)
+
             if positions:
                 for position in positions:
                     if float(position["initialMargin"]) != 0:
-                        print(position)
                         user_positions.append(position)
+
             if user_positions:
+                response_data = []
+                for data in user_positions:
+                    symbol = data["symbol"]
+                    ticker = exchange.fetch_ticker(symbol)
+                    mark_price = ticker["info"]["lastPrice"]
+                    response_data.append(
+                        {
+                            "symbol": data["symbol"],
+                            "size": data["positionAmt"],
+                            "entry_price": data["entryPrice"],
+                            "margin": data["initialMargin"],
+                            "mark_price": mark_price,
+                            "pnl": data["unrealizedProfit"],
+                        }
+                    )
                 return Response(
                     {
-                        "data": user_positions,
-                        "message": "positions found",
+                        "data": response_data,
+                        "message": "Positions found",
                         "success": True,
                     },
                     status=status.HTTP_200_OK,
                 )
             else:
                 return Response(
-                    {"data": [], "message": "no positions found", "success": False},
+                    {"data": [], "message": "No positions found", "success": False},
                     status=status.HTTP_204_NO_CONTENT,
                 )
         else:
             return Response(
-                {"data": [], "message": "no api key found", "success": False},
+                {"data": [], "message": "No API key found", "success": False},
                 status=status.HTTP_204_NO_CONTENT,
             )
 

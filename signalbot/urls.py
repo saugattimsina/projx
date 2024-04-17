@@ -11,7 +11,8 @@ from .views import (
     #    ShowUserOrders
     showTotalProfit,
 )
-from .apiview import OpenOrders, ShowBalance, TradeHistoryView, ShowPositions
+from .apiview import OpenOrders, ShowBalance, ShowPositions
+from .api_views.trade import TradeHistroyApiViewSet
 
 app_name = "signalbot"
 urlpatterns = [
@@ -29,13 +30,14 @@ urlpatterns = [
     path("telegram/<str:token>/", TelegramWebhook.as_view(), name="telegram_webhook"),
     # api view
     path("openorders/", OpenOrders.as_view(), name="openorders"),
-    path("tradehistory/", TradeHistoryView.as_view(), name="closedorders"),
-    path(
-        "tradehistory/<str:starting_date>/<str:ending_date>/",
-        TradeHistoryView.as_view(),
-        name="closedorders-by-date",
-    ),
+    # path("tradehistory/", TradeHistoryView.as_view({"get:list"})),
+    # path(
+    #     "tradehistory/<str:starting_date>/<str:ending_date>/",
+    #     TradeHistoryView.as_view(),
+    #     name="closedorders-by-date",
+    # ),
     path("balance/", ShowBalance.as_view(), name="balance-show"),
     path("positions/", ShowPositions.as_view(), name="positions-show"),
     path("show/profit/", showTotalProfit, name="showTotalProfit"),
+    path("my-trade-history/", TradeHistroyApiViewSet.as_view({"get": "list"})),
 ]

@@ -43,12 +43,26 @@ class TradeSignalsForm(forms.ModelForm):
         percentage_2 = cleaned_data.get("percentage_2")
         percentage_3 = cleaned_data.get("percentage_3")
         percentage_4 = cleaned_data.get("percentage_4")
+        trade_type = cleaned_data.get("trade_type")
 
-        if stop_amount and price and stop_amount >= price:
-            self.add_error("stop_amount", "Stop amount should be less than price.")
+        if trade_type == "buy":
+            if stop_amount and price and stop_amount >= price:
+                self.add_error("stop_amount", "Stop amount should be less than price.")
 
-        if price and (amount_1 + amount_2 + amount_3 + amount_4) <= price:
-            self.add_error("amount_1", "Sum of 4 amounts should be greater than price.")
+            if price and (amount_1 + amount_2 + amount_3 + amount_4) <= price:
+                self.add_error(
+                    "amount_1", "Sum of 4 amounts should be greater than price."
+                )
+        elif trade_type == "sell":
+            if stop_amount and price and stop_amount <= price:
+                self.add_error(
+                    "stop_amount", "Stop amount should be greater than price."
+                )
+
+            if price and (amount_1 + amount_2 + amount_3 + amount_4) >= price:
+                self.add_error(
+                    "amount_1", "Sum of 4 amounts should be less than price."
+                )
 
         total_percentage = percentage_1 + percentage_2 + percentage_3 + percentage_4
         if total_percentage != 100:

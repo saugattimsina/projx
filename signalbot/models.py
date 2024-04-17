@@ -70,6 +70,7 @@ class TradeHistory(models.Model):
     profit_loss = models.FloatField()
     trade_fee = models.FloatField()
     fee_currency = models.CharField(max_length=255)
+    timestamp = models.BigIntegerField(default=0)
     created_on = models.DateTimeField(null=True, blank=True)
 
 

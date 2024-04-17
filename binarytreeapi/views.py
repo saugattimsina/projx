@@ -72,10 +72,11 @@ class GetMYParentandChildren(APIView):
 
 class GetUserRankApiView(APIView):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, user_id):
+    def get(self, request):
         try:
-            user = User.objects.get(id=user_id)
+            user = request.user
             user_rank = UserRank.objects.get(user=user)
             next_rank = (
                 MLMRank.objects.filter(min_referrals__gt=user_rank.rank.min_referrals)
@@ -145,4 +146,11 @@ class GetUserRankApiView(APIView):
                 status=status.HTTP_200_OK,
             )
         except User.DoesNotExist:
-            return Response({"error": "User not found", "success": False}, status=404)
+            return Response(
+                {"error": "User not found", "success": False},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e), "success": False}, status=status.HTTP_400_BAD_REQUEST
+            )

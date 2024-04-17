@@ -99,6 +99,7 @@ def create_default_subscription(sender, instance, created, **kwargs):
         user = instance.user
         pakage_type = instance.plan.package_type
         if pakage_type != "free":
+            print("user subscribed")
             user.is_suscribed = True
             user.save()
 
@@ -107,6 +108,7 @@ def create_default_subscription(sender, instance, created, **kwargs):
         else:
             if user.is_suscribed:
                 if not MLMMember.objects.filter(user=user).exists():
+                    print("yaha puge ko xa")
                     parent = MLMMember.objects.get(user=user.refered)
                     parent.add_child(user=user, name=user.username, sponsor=parent)
 
@@ -189,13 +191,10 @@ def create_default_subscription(sender, instance, created, **kwargs):
 @receiver(post_save, sender=UserSubcription)
 def enrollment_commision(sender, instance, created, **kwargs):
     if created:
-        print(1)
         user = instance.user
         if user.is_suscribed:
-            print(2)
             no_sub_payment = UserSubPaymentHistory.objects.filter(user=user).count()
             if no_sub_payment == 1:
-                print(3)
                 amount = instance.plan.price
                 x = MLMMember.objects.get(user=user)
                 reffered_by = user.refered

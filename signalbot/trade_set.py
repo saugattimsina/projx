@@ -184,10 +184,16 @@ def create_my_trade(signal_obj, user, userkey):
     #         f"price can't be higher than {round((price_now + price_now * 0.005), 4)}"
     #     )
     #     return f"price can't be higher than {round((price_now + price_now * 0.005), 4)}"
-
+    amount = (
+        signal_obj.amount_1
+        + signal_obj.amount_2
+        + signal_obj.amount_3
+        + signal_obj.amount_4
+    )
+    print(amount)
     if trade_side == "buy" and price < stop_price:
         return f"Stop loss cannot be higher than price"
-    elif trade_side == "sell" and price < signal_obj.amount:
+    elif trade_side == "sell" and price < amount:
         return f"Take profit cannot be less the price"
 
     try:

@@ -117,7 +117,7 @@ class TradeHistorySerializer(serializers.Serializer):
 class TradesHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = TradeHistory
-        fields = "__all__"
+        exclude = ["user", "timestamp"]
 
 
 class ReferalIncomeHistorySerializer(serializers.ModelSerializer):
