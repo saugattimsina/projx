@@ -3,7 +3,7 @@ from .apiview import ReferalIncomeHistoryAPIView, EarnningStatsApiView
 
 urlpatterns = [
     path(
-        "referal-income-history/<int:user_id>",
+        "referal-income-history/",
         ReferalIncomeHistoryAPIView.as_view({"get": "list"}),
     ),
     path(

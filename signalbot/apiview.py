@@ -353,30 +353,14 @@ def create_new_history(user):
 
 
 class ReferalIncomeHistoryAPIView(ModelViewSet):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     serializer_class = ReferalIncomeHistorySerializer
 
-    def list(self, request, user_id):
-        user = User.objects.filter(id=user_id).first()
-        if user:
-            serializer = ReferalIncomeHistorySerializer(
-                data=ReferalIncome.objects.filter(money_allocated_to=user), many=True
-            )
-            serializer.is_valid()
-            return Response(
-                {
-                    "data": serializer.data,
-                    "message": "User income history",
-                    "sucess": True,
-                },
-                status=status.HTTP_200_OK,
-            )
-        else:
-            return Response(
-                {"data": [], "message": "no user found", "sucess": False},
-                status=status.HTTP_204_NO_CONTENT,
-            )
+    def get_queryset(self):
+        user = self.request.user
+        queryset = ReferalIncome.objects.filter(money_allocated_to=user)
+        return queryset
 
 
 class EarnningStatsApiView(APIView):
