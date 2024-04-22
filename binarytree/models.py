@@ -61,21 +61,20 @@ class MLMRank(models.Model):
         upload_to="uploads/ranks/%Y/%m/%d/", null=True, blank=True
     )
     rank_choice = (
-        ("Unranked", "Unranked"),
-        ("Bronze", "Bronze"),
-        ("Silver", "Silver"),
-        ("Gold", "Gold"),
-        ("Platinum", "Platinum"),
-        ("Diamond", "Diamond"),
+        ("Pawn", "Pawn"),
+        ("Knight", "Knight"),
+        ("Bishop", "Bishop"),
+        ("Rook", "Rook"),
+        ("Queen", "Queen"),
+        ("King", "King"),
     )
     equivalent_name = models.CharField(
-        max_length=25, choices=rank_choice, default="Unranked"
+        max_length=25, choices=rank_choice, default="Pawn"
     )
     rank_name = models.CharField(max_length=25, null=True, blank=True)
-    min_referrals = models.IntegerField(null=True, blank=True)
-    max_referrals = models.IntegerField(null=True, blank=True)
-    min_team_size = models.IntegerField(null=True, blank=True)
-    max_team_size = models.IntegerField(null=True, blank=True)
+    direct_referrals = models.IntegerField(default=0)
+    active_members = models.IntegerField(default=0)
+    separate_enroller_tree_conditions = models.JSONField(default=dict)
 
     # def __str__(self):
     #     return self.rank_name

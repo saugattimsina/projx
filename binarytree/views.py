@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from .models import MLMMember, MLMBinary, MLMRank, UserRank
 
 from user.models import User  # Import the User model
+from .determine_rank import find_all_parent_node
 
 # Create your views here.
 # def get_all_nodes_recursive(node):
@@ -168,19 +169,7 @@ from .models import BinaryParents
 
 def determine_rank_in_tree(request):
     x = User.objects.get(username="admin")
-    plan = Subscription.objects.get(package_type="paid")
-    for i in range(1, 101):
-        user = User.objects.create(
-            username=f"test{i}", password="yamagod123a@", refered=x
-        )
-        if i % 2 == 0:
-            UserSubcription.objects.create(user=user, plan=plan)
-            UserSubPaymentHistory.objects.create(
-                user=user,
-                subscription=plan,
-                date_transaction=datetime.now(),
-                amount=plan.price,
-            )
+    find_all_parent_node(x)
     return HttpResponse("ok")
 
 
@@ -197,17 +186,6 @@ def create_parents_binary(user):
 
 
 def determineparents(request):
-    x = User.objects.get(username="aadarsha")
-    plan = Subscription.objects.get(package_type="paid")
-    for i in range(1, 101):
-        user = User.objects.create(username="test1", password="yamagod123a@", refered=x)
-        if i % 2 == 0:
-            UserSubcription.objects.create(user=user, plan=plan)
-            UserSubPaymentHistory.objects.create(
-                useer=user,
-                subscription=plan,
-                date_transaction=datetime.now(),
-                amount=plan.price,
-            )
-
+    x = User.objects.get(id=58)
+    find_all_parent_node(x)
     return HttpResponse("ok")
