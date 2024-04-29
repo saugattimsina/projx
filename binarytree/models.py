@@ -74,7 +74,7 @@ class MLMRank(models.Model):
     rank_name = models.CharField(max_length=25, null=True, blank=True)
     direct_referrals = models.IntegerField(default=0)
     active_members = models.IntegerField(default=0)
-    separate_enroller_tree_conditions = models.JSONField(default=dict)
+    separate_enroller_tree_conditions = models.JSONField(null=True)
     rank_level = models.IntegerField(default=0)
 
     def __str__(self):
