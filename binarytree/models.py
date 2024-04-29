@@ -75,9 +75,10 @@ class MLMRank(models.Model):
     direct_referrals = models.IntegerField(default=0)
     active_members = models.IntegerField(default=0)
     separate_enroller_tree_conditions = models.JSONField(default=dict)
+    rank_level = models.IntegerField(default=0)
 
-    # def __str__(self):
-    #     return self.rank_name
+    def __str__(self):
+        return self.rank_name
 
 
 class UserRank(models.Model):

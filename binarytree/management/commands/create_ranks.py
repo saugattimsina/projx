@@ -13,6 +13,7 @@ class Command(BaseCommand):
             direct_referrals=0,
             active_members=0,
             separate_enroller_tree_conditions={},
+            rank_level=1,
         )
 
         # Knight
@@ -22,6 +23,7 @@ class Command(BaseCommand):
             direct_referrals=5,
             active_members=20,
             separate_enroller_tree_conditions={},
+            rank_level=2,
         )
 
         # Bishop
@@ -34,6 +36,7 @@ class Command(BaseCommand):
                 "rank": {"Knight": 3},
                 "member": {"total": 100, "tree": 30},
             },
+            rank_level=3,
         )
 
         # Rook
@@ -46,6 +49,7 @@ class Command(BaseCommand):
                 "rank": {"Bishop": 3},
                 "member": {"total": 300, "tree": 75},
             },
+            rank_level=4,
         )
 
         # Queen
@@ -58,6 +62,7 @@ class Command(BaseCommand):
                 "rank": {"Rook": 3},
                 "member": {"total": 1500, "tree": 300},
             },
+            rank_level=5,
         )
 
         # King
@@ -70,6 +75,7 @@ class Command(BaseCommand):
                 "rank": {"Queen": 3},
                 "member": {"total": 33000, "tree": 6000},
             },
+            rank_level=6,
         )
 
         # Print success message

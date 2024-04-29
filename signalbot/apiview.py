@@ -456,7 +456,7 @@ class ShowPositions(APIView):
                 for position in positions:
                     if float(position["initialMargin"]) != 0:
                         user_positions.append(position)
-
+            print(user_positions)
             if user_positions:
                 response_data = []
                 for data in user_positions:

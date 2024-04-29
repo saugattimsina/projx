@@ -110,13 +110,16 @@ def determine_rank(ancestors):
                 print("new rank: ", rank.equivalent_name)
                 user_rank.rank = rank
                 user_rank.save()
-            elif Rook >= 3 or active_member >= 1500:
+            elif Rook >= 3 or (active_member >= 1500 and active_member < 33000):
                 rank = MLMRank.objects.get(equivalent_name="Queen")
                 print("new rank: ", rank.equivalent_name)
                 user_rank.rank = rank
                 user_rank.save()
             elif (
-                (direct_referrals >= 30 and active_members <= 300)
+                (
+                    direct_referrals >= 30
+                    and (active_members <= 300 and active_members > 100)
+                )
                 or Bishop >= 3
                 or active_member >= 300
             ):
@@ -125,7 +128,10 @@ def determine_rank(ancestors):
                 user_rank.rank = rank
                 user_rank.save()
             elif (
-                (direct_referrals >= 10 and active_members <= 100)
+                (
+                    direct_referrals >= 10
+                    and (active_members <= 100 and active_members > 20)
+                )
                 or Knight >= 3
                 or active_member >= 100
             ):

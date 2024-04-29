@@ -10,6 +10,9 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContex
 import json
 from .trade_set import create_my_trade
 import logging
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.db import transaction
 
 # import tracemalloc
 # tracemalloc.start()
@@ -18,7 +21,7 @@ import logging
 # bot = telegram.Bot(token='6167336537:AAGaviat4GGhS8gdTeoA6xHf9YRQ8-_-5QI')
 reply_url = f"https://api.telegram.org/bot{settings.TELEGRAM_API_TOKEN}/sendMessage"
 
-logger = logging.getLogger("django.request")
+# logger = logging.getLogger("django.request")
 
 
 # Convert the keyboard dictionary to JSON format
@@ -28,7 +31,7 @@ def create_default_subscription(sender, instance, created, **kwargs):
     print(instance)
     # if created:
     print("signal recived")
-    logger.info("signal recived")
+    # logger.info("signal recived")
     users_with_uuid = User.objects.filter(is_client=True)
 
     keyboard = {
@@ -91,3 +94,19 @@ def create_telegram_msg(sender, instance, created, **kwargs):
                 requests.post(reply_url, data=data)
             except:
                 pass
+
+
+@receiver(post_save, sender=TradeHistory)
+def send_trade_update(sender, instance, created, **kwargs):
+
+    def send_update():
+        channel_layer = get_channel_layer()
+        group_name = f"user_{instance.user.username}"
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                "type": "send_initial_trade_history",
+            },
+        )
+
+    transaction.on_commit(send_update)

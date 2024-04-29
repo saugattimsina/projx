@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from user.models import User
 from subscription.models import UserSubcription
+from .serializers import MLMRankSerializer
 
 
 # Create your views here.
@@ -78,77 +79,63 @@ class GetUserRankApiView(APIView):
         try:
             user = request.user
             user_rank = UserRank.objects.get(user=user)
-            next_rank = (
-                MLMRank.objects.filter(min_referrals__gt=user_rank.rank.min_referrals)
-                .order_by("min_referrals")
-                .first()
-            )
-            previous_rank = (
-                MLMRank.objects.filter(min_referrals__lt=user_rank.rank.min_referrals)
-                .order_by("-min_referrals")
-                .first()
-            )
-            x = MLMMember.objects.get(user=user)
-            referrals = x.get_children_count()
-            team_size = x.get_descendant_count()
-            required_refferals = 0
-            required_team_size = 0
-            if next_rank:
-                if referrals < next_rank.min_referrals:
-                    required_refferals = next_rank.min_referrals - referrals
-                    if required_refferals < 0:
-                        required_refferals = 0
-                if team_size < next_rank.min_team_size:
-                    required_team_size = next_rank.min_team_size - team_size
-                    if required_team_size < 0:
-                        required_team_size = 0
+            mlm_member = MLMMember.objects.get(user=user)
+            mlm_binary = MLMBinary.objects.get(name=user)
+
+            user_rank_level = user_rank.rank.rank_level
+            user_direct_referrals = mlm_member.get_children_count()
+            user_active_members = mlm_binary.get_descendant_count()
+
+            if user_rank_level > 1:
+                previous_rank = MLMRank.objects.filter(
+                    rank_level=user_rank_level - 1
+                ).first()
+                previous_rank_serializer = (
+                    MLMRankSerializer(previous_rank).data if previous_rank else None
+                )
+            else:
+                previous_rank_serializer = None
+
+            if user_rank_level < 6:
+                next_rank = MLMRank.objects.filter(
+                    rank_level=user_rank_level + 1
+                ).first()
+                next_rank_serializer = (
+                    MLMRankSerializer(next_rank).data if next_rank else None
+                )
+            else:
+                next_rank_serializer = None
+
+            current_rank_serializer = MLMRankSerializer(user_rank.rank).data
+            all_ranks = MLMRank.objects.all()
+            all_rank_serializers = MLMRankSerializer(all_ranks, many=True)
             return Response(
                 {
-                    "message": "User rank and requirement for next rank fetched successfully",
-                    "data": {
-                        "current_rank": {
-                            "name": (
-                                user_rank.rank.equivalent_name if user_rank else None
-                            ),
-                            "image": (
-                                user_rank.rank.rank_image.url
-                                if user_rank.rank.rank_image
-                                else None
-                            ),
-                            "total_referal": referrals,
-                            "team_size": team_size,
-                        },
-                        "previous_rank": {
-                            "name": (
-                                previous_rank.equivalent_name if previous_rank else None
-                            ),
-                            "image": (
-                                previous_rank.rank_image.url if previous_rank else None
-                            ),
-                        },
-                        "next_rank": {
-                            "name": next_rank.equivalent_name if next_rank else None,
-                            "image": next_rank.rank_image.url if next_rank else None,
-                            "total_numbers_of_referal": (
-                                next_rank.min_referrals if next_rank else None
-                            ),
-                            "total_team_size": (
-                                next_rank.min_team_size if next_rank else None
-                            ),
-                        },
-                        "condition_for_next_rank": {
-                            "required_direct_refferal": required_refferals,
-                            "required_team_size": required_team_size,
-                        },
+                    "current_rank": current_rank_serializer,
+                    "previous_rank": previous_rank_serializer,
+                    "next_rank": next_rank_serializer,
+                    "current_user_stats": {
+                        "user_direct_referrals": user_direct_referrals,
+                        "user_active_members": user_active_members,
                     },
-                    "success": True,
-                },
-                status=status.HTTP_200_OK,
+                    "all_ranks": all_rank_serializers.data,
+                }
             )
-        except User.DoesNotExist:
+
+        except UserRank.DoesNotExist:
             return Response(
-                {"error": "User not found", "success": False},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"error": "UserRank not found for the given user.", "success": False},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except MLMMember.DoesNotExist:
+            return Response(
+                {"error": "MLMMember not found for the given user.", "success": False},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except MLMBinary.DoesNotExist:
+            return Response(
+                {"error": "MLMBinary not found for the given user.", "success": False},
+                status=status.HTTP_404_NOT_FOUND,
             )
         except Exception as e:
             return Response(

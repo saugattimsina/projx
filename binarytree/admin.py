@@ -28,5 +28,10 @@ admin.site.register(MLMBinary, MyAdmin1)
 # admin.site.register(ForcedMatrix, MyAdmin2)
 
 admin.site.register(MLMRank)
-admin.site.register(UserRank)
 admin.site.register(BinaryParents)
+
+
+@admin.register(UserRank)
+class UserRankAdmin(admin.ModelAdmin):
+    list_display = ("user", "rank")
+    list_filter = ("rank",)

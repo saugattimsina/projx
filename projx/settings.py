@@ -38,6 +38,7 @@ ALLOWED_HOSTS = ["*"]
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -106,6 +107,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "projx.wsgi.application"
+ASGI_APPLICATION = "projx.asgi.application"
 # TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
@@ -174,7 +176,8 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "user.User"
-TELEGRAM_API_TOKEN = "6910792549:AAF8Y-9XlH5sajAsz4qXL_9WaraqTZzFfI4"
+# TELEGRAM_API_TOKEN = "6910792549:AAF8Y-9XlH5sajAsz4qXL_9WaraqTZzFfI4"
+TELEGRAM_API_TOKEN = "6904856391:AAGPOXGZ4DRmT259tH6oW9jty7H1lJZ1Gx0"
 TELEGRAM_WEBHOOK_TOKEN = "somerandomstring"
 
 CELERY_BROKER_URL = "redis://redis_server:6379/0"
@@ -219,24 +222,33 @@ TEMPLATED_EMAIL_BACKEND = "templated_email.backends.vanilla_django"
 TEMPLATED_EMAIL_TEMPLATE_DIR = "email/"
 TEMPLATED_EMAIL_FILE_EXTENSION = "html.j2"
 
-LOGGING = {
-    "version": 1,
-    "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-        },
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.FileHandler",
-            "filename": BASE_DIR / "logging.log",
-        },
-    },
-    "loggers": {
-        "django.request": {
-            "handlers": ["console", "file"],
-            "level": "DEBUG",
-            "propagate": True,
+# LOGGING = {
+#     "version": 1,
+#     "handlers": {
+#         "console": {
+#             "level": "DEBUG",
+#             "class": "logging.StreamHandler",
+#         },
+#         "file": {
+#             "level": "DEBUG",
+#             "class": "logging.FileHandler",
+#             "filename": BASE_DIR / "logging.log",
+#         },
+#     },
+#     "loggers": {
+#         "django.request": {
+#             "handlers": ["console", "file"],
+#             "level": "DEBUG",
+#             "propagate": True,
+#         },
+#     },
+# }
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
         },
     },
 }
