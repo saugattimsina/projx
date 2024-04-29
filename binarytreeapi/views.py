@@ -7,6 +7,12 @@ from rest_framework import status, permissions
 from user.models import User
 from subscription.models import UserSubcription
 from .serializers import MLMRankSerializer
+from .services.calculate_level_and_percent_earning import (
+    calculate_percent_level_quick_start,
+    calculate_percent_level_matrix,
+    circle_network_residual_pool_bonus,
+    calculate_trading_profit_level_percentage,
+)
 
 
 # Create your views here.
@@ -109,6 +115,23 @@ class GetUserRankApiView(APIView):
             current_rank_serializer = MLMRankSerializer(user_rank.rank).data
             all_ranks = MLMRank.objects.all()
             all_rank_serializers = MLMRankSerializer(all_ranks, many=True)
+
+            quick_percentage, quick_level = calculate_percent_level_quick_start(
+                user_rank.rank.equivalent_name
+            )
+
+            matrix_percentage, matrix_level = calculate_percent_level_matrix(
+                user_rank.rank.equivalent_name
+            )
+
+            trade_percentage, trade_level = calculate_trading_profit_level_percentage(
+                user_rank.rank.equivalent_name
+            )
+
+            circle_network_residual_pool_bonus_percentage = (
+                circle_network_residual_pool_bonus(user_rank.rank.equivalent_name)
+            )
+
             return Response(
                 {
                     "current_rank": current_rank_serializer,
@@ -117,6 +140,15 @@ class GetUserRankApiView(APIView):
                     "current_user_stats": {
                         "user_direct_referrals": user_direct_referrals,
                         "user_active_members": user_active_members,
+                    },
+                    "earning": {
+                        "quick_start_earning_level": quick_level,
+                        "quick_start_earning_percentage": quick_percentage,
+                        "matrix_earning_level": matrix_level,
+                        "matrix_earning_percentage": matrix_percentage,
+                        "trade_profit_earning_level": trade_level,
+                        "trade_profit_earning_percentage": trade_percentage,
+                        "circle_network_residual_pool_bonus_percentage": circle_network_residual_pool_bonus_percentage,
                     },
                     "all_ranks": all_rank_serializers.data,
                 }
