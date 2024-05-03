@@ -59,10 +59,11 @@ INSTALLED_APPS = [
     "accountsapi",
     "binarytree",
     "treebeard",
-    "django_crontab",
     "wallet",
     "binarytreeapi",
     "corsheaders",
+    "orders",
+    "django_crontab",
 ]
 if DEBUG:
     # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -176,8 +177,8 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "user.User"
-# TELEGRAM_API_TOKEN = "6910792549:AAF8Y-9XlH5sajAsz4qXL_9WaraqTZzFfI4"
-TELEGRAM_API_TOKEN = "6904856391:AAGPOXGZ4DRmT259tH6oW9jty7H1lJZ1Gx0"
+TELEGRAM_API_TOKEN = "7130161890:AAFbWvSFDC6CsY0_AoDNQe5Nv7-PBaCs1sY"
+# TELEGRAM_API_TOKEN = "6904856391:AAGPOXGZ4DRmT259tH6oW9jty7H1lJZ1Gx0"
 TELEGRAM_WEBHOOK_TOKEN = "somerandomstring"
 
 CELERY_BROKER_URL = "redis://redis_server:6379/0"
@@ -206,7 +207,17 @@ SWAGGER_SETTINGS = {
 
 CRONJOBS = [
     # ("* * * * *", "binarytree.utils.create_user_payment"),
-    ("* * * * *", "signalbot.cornjob.get_trade_history"),
+    # ("* * * * *", "signalbot.cornjob.get_trade_history"),
+    (
+        "*/5 * * * *",
+        "orders.cron.orders.updateOrder",
+        ">> /tmp/updateOrder.log",
+    ),
+    (
+        "*/5 * * * *",
+        "orders.cron.positions.updatePositions",
+        ">> /tmp/updatePositions.log",
+    ),
 ]
 
 # Email Backend Configuration

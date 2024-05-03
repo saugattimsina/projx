@@ -19,6 +19,8 @@ from rest_framework import status
 from django.db.models import Count, Sum
 import ccxt
 from jsonview.decorators import json_view
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 # from django.forms import formset_factory
 from django.forms import modelformset_factory
@@ -37,6 +39,7 @@ class TradeCreateView(CreateView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
+@method_decorator(csrf_exempt, name="dispatch")
 class TelegramWebhook(APIView):
     def post(self, request, token):
         print(token)

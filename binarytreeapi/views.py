@@ -84,76 +84,86 @@ class GetUserRankApiView(APIView):
     def get(self, request):
         try:
             user = request.user
-            user_rank = UserRank.objects.get(user=user)
-            mlm_member = MLMMember.objects.get(user=user)
-            mlm_binary = MLMBinary.objects.get(name=user)
+            if user.is_suscribed:
+                user_rank = UserRank.objects.get(user=user)
+                mlm_member = MLMMember.objects.get(user=user)
+                mlm_binary = MLMBinary.objects.get(name=user)
 
-            user_rank_level = user_rank.rank.rank_level
-            user_direct_referrals = mlm_member.get_children_count()
-            user_active_members = mlm_binary.get_descendant_count()
+                user_rank_level = user_rank.rank.rank_level
+                user_direct_referrals = mlm_member.get_children_count()
+                user_active_members = mlm_binary.get_descendant_count()
 
-            if user_rank_level > 1:
-                previous_rank = MLMRank.objects.filter(
-                    rank_level=user_rank_level - 1
-                ).first()
-                previous_rank_serializer = (
-                    MLMRankSerializer(previous_rank).data if previous_rank else None
+                if user_rank_level > 1:
+                    previous_rank = MLMRank.objects.filter(
+                        rank_level=user_rank_level - 1
+                    ).first()
+                    previous_rank_serializer = (
+                        MLMRankSerializer(previous_rank).data if previous_rank else None
+                    )
+                else:
+                    previous_rank_serializer = None
+
+                if user_rank_level < 6:
+                    next_rank = MLMRank.objects.filter(
+                        rank_level=user_rank_level + 1
+                    ).first()
+                    next_rank_serializer = (
+                        MLMRankSerializer(next_rank).data if next_rank else None
+                    )
+                else:
+                    next_rank_serializer = None
+
+                current_rank_serializer = MLMRankSerializer(user_rank.rank).data
+                all_ranks = MLMRank.objects.all()
+                all_rank_serializers = MLMRankSerializer(all_ranks, many=True)
+
+                quick_percentage, quick_level = calculate_percent_level_quick_start(
+                    user_rank.rank.equivalent_name
+                )
+
+                matrix_percentage, matrix_level = calculate_percent_level_matrix(
+                    user_rank.rank.equivalent_name
+                )
+
+                trade_percentage, trade_level = (
+                    calculate_trading_profit_level_percentage(
+                        user_rank.rank.equivalent_name
+                    )
+                )
+
+                circle_network_residual_pool_bonus_percentage = (
+                    circle_network_residual_pool_bonus(user_rank.rank.equivalent_name)
+                )
+
+                return Response(
+                    {
+                        "current_rank": current_rank_serializer,
+                        "previous_rank": previous_rank_serializer,
+                        "next_rank": next_rank_serializer,
+                        "current_user_stats": {
+                            "user_direct_referrals": user_direct_referrals,
+                            "user_active_members": user_active_members,
+                        },
+                        "earning": {
+                            "quick_start_earning_level": quick_level,
+                            "quick_start_earning_percentage": quick_percentage,
+                            "matrix_earning_level": matrix_level,
+                            "matrix_earning_percentage": matrix_percentage,
+                            "trade_profit_earning_level": trade_level,
+                            "trade_profit_earning_percentage": trade_percentage,
+                            "circle_network_residual_pool_bonus_percentage": circle_network_residual_pool_bonus_percentage,
+                        },
+                        "all_ranks": all_rank_serializers.data,
+                    }
                 )
             else:
-                previous_rank_serializer = None
-
-            if user_rank_level < 6:
-                next_rank = MLMRank.objects.filter(
-                    rank_level=user_rank_level + 1
-                ).first()
-                next_rank_serializer = (
-                    MLMRankSerializer(next_rank).data if next_rank else None
+                return Response(
+                    {
+                        "error": "You need to subscribe to get your rank",
+                        "success": False,
+                    },
+                    status=status.HTTP_404_NOT_FOUND,
                 )
-            else:
-                next_rank_serializer = None
-
-            current_rank_serializer = MLMRankSerializer(user_rank.rank).data
-            all_ranks = MLMRank.objects.all()
-            all_rank_serializers = MLMRankSerializer(all_ranks, many=True)
-
-            quick_percentage, quick_level = calculate_percent_level_quick_start(
-                user_rank.rank.equivalent_name
-            )
-
-            matrix_percentage, matrix_level = calculate_percent_level_matrix(
-                user_rank.rank.equivalent_name
-            )
-
-            trade_percentage, trade_level = calculate_trading_profit_level_percentage(
-                user_rank.rank.equivalent_name
-            )
-
-            circle_network_residual_pool_bonus_percentage = (
-                circle_network_residual_pool_bonus(user_rank.rank.equivalent_name)
-            )
-
-            return Response(
-                {
-                    "current_rank": current_rank_serializer,
-                    "previous_rank": previous_rank_serializer,
-                    "next_rank": next_rank_serializer,
-                    "current_user_stats": {
-                        "user_direct_referrals": user_direct_referrals,
-                        "user_active_members": user_active_members,
-                    },
-                    "earning": {
-                        "quick_start_earning_level": quick_level,
-                        "quick_start_earning_percentage": quick_percentage,
-                        "matrix_earning_level": matrix_level,
-                        "matrix_earning_percentage": matrix_percentage,
-                        "trade_profit_earning_level": trade_level,
-                        "trade_profit_earning_percentage": trade_percentage,
-                        "circle_network_residual_pool_bonus_percentage": circle_network_residual_pool_bonus_percentage,
-                    },
-                    "all_ranks": all_rank_serializers.data,
-                }
-            )
-
         except UserRank.DoesNotExist:
             return Response(
                 {"error": "UserRank not found for the given user.", "success": False},

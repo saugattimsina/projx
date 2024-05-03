@@ -10,9 +10,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContex
 import json
 from .trade_set import create_my_trade
 import logging
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-from django.db import transaction
+
 
 # import tracemalloc
 # tracemalloc.start()
@@ -94,19 +92,3 @@ def create_telegram_msg(sender, instance, created, **kwargs):
                 requests.post(reply_url, data=data)
             except:
                 pass
-
-
-@receiver(post_save, sender=TradeHistory)
-def send_trade_update(sender, instance, created, **kwargs):
-
-    def send_update():
-        channel_layer = get_channel_layer()
-        group_name = f"user_{instance.user.username}"
-        async_to_sync(channel_layer.group_send)(
-            group_name,
-            {
-                "type": "send_initial_trade_history",
-            },
-        )
-
-    transaction.on_commit(send_update)

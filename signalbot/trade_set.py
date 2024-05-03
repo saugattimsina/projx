@@ -2,6 +2,7 @@
 import ccxt
 from .models import SignalFollowedBy, Portfolio
 import logging
+from orders.models import Order
 
 logger = logging.getLogger("django.request")
 # BINANCETN_API_KEY = "568fbe6822165f8feb172cd10ce0e1c39bd61f1102fab71d95fb9860eb94b226"
@@ -241,6 +242,16 @@ def create_my_trade(signal_obj, user, userkey):
             price=price,
         )
         print("created order")
+        order = Order.objects.create(
+            user=user,
+            symbol=signal_obj.symbol,
+            order_id=create_order["id"],
+            entry_price=price,
+            order_quantity=quantity,
+            trade_direction=signal_obj.trade_type,
+        )
+        follower.first_order_id = order
+        follower.save()
         logging.info("created order")
     except Exception as e:
         logging.info(str(e))
@@ -262,6 +273,15 @@ def create_my_trade(signal_obj, user, userkey):
             params=additional_params,
         )
         print("stop_loss_order created")
+        stopLoss_order = Order.objects.create(
+            user=user,
+            symbol=signal_obj.symbol,
+            order_id=stop_loss_order["id"],
+            entry_price=stop_price,
+            order_quantity=quantity,
+            trade_direction="STOP_LOSS",
+            related_order=order,
+        )
         logging.info("stop_loss_order created")
     except Exception as e:
         print(e)
@@ -299,6 +319,15 @@ def create_my_trade(signal_obj, user, userkey):
                 params=additional_params,
             )
             print("take_profit_order created")
+            TAKE_PROFIT_order = Order.objects.create(
+                user=user,
+                symbol=signal_obj.symbol,
+                order_id=take_profit_order["id"],
+                entry_price=amount,
+                order_quantity=quantity_new,
+                trade_direction="TAKE_PROFIT",
+                related_order=order,
+            )
             logging.info("take_profit_order created")
         except Exception as e:
             print(e)

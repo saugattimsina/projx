@@ -1,5 +1,6 @@
 from django.db import models
 from user.models import User
+from orders.models import Order
 
 # Create your models here.
 
@@ -44,6 +45,9 @@ class TradeSignals(models.Model):
 class SignalFollowedBy(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     signal = models.ForeignKey(TradeSignals, on_delete=models.CASCADE)
+    first_order_id = models.ForeignKey(
+        Order, on_delete=models.SET_NULL, null=True, blank=True
+    )
     is_cancelled = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True)
 
