@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "orders",
     "django_crontab",
+    "posts",
 ]
 if DEBUG:
     # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -228,6 +229,11 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 FRONTEND_URL = os.environ.get("FRONTEND_URL")
+EXTERNAL_API_URL = os.environ.get(
+    "EXTERNAL_API_URL", "https://tronapi.starexports.org//api/v1"
+)
+EXTERNAL_API_USERNAME = os.environ.get("EXTERNAL_API_USERNAME", "Admin")
+EXTERNAL_API_PASSWORD = os.environ.get("EXTERNAL_API_PASSWORD", "Password@321")
 
 TEMPLATED_EMAIL_BACKEND = "templated_email.backends.vanilla_django"
 TEMPLATED_EMAIL_TEMPLATE_DIR = "email/"

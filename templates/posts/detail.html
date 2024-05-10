@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% block content %}
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="font-size-40 mt-2 text-center">{{post.title}}</h4>
+            </div>
+        </div>
+    <div class="row">
+        <div class="row">
+            <div class="col-md-12 col-xl-12"/>
+                <div class="card">
+                    {% if post.image %}
+                        <img src="{{post.image.url}}" class="img-fluid" alt="Responsive image">
+                    {% else %}
+                        <img class="card-img-top img-fluid" src="" alt="no image">
+                    {% endif %}
+                    <div class="card-body">
+                        <p class="card-text">{{ post.content|safe }}</p>
+                    </div>
+                    <div>
+                        <a href="{% url 'post_edit' post.pk %}" class="btn btn-success">Edit</a>
+                        <a href="{% url 'post_delete' post.pk %}" class="btn btn-danger">Delete</a>
+                        <a href="{% url 'post_list' %}" class="btn btn-secondary">Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

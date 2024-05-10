@@ -1,0 +1,28 @@
+{% extends 'base.html' %} 
+{% block content %} 
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="font-size-40 mt-2 text-center">List Post</h4>
+            </div>
+        </div>
+    <div class="row">
+        {% for post in posts  %}
+            <div class="col-md-6 col-xl-3 "/>
+                <div class="card">
+                    {% if post.image %}
+                        <img class="card-img-top img-fluid" src="{{post.image.url}}" alt="Card image cap">
+                    {% else %}
+                        <img class="card-img-top img-fluid" src="" alt="no image">
+                    {% endif %}
+                    <div class="card-body">
+                        <h4 class="card-title ">{{post.title}}</h4>
+                        <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary waves-effect waves-light">See more</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}
