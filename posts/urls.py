@@ -18,7 +18,7 @@ urlpatterns = [
     path("web/post/<int:pk>/delete/", PostDeleteView.as_view(), name="post_delete"),
     path("post/", PostViewSet.as_view({"get": "list", "post": "create"})),
     path("post/public/", PublicPostViewSet.as_view({"get": "list"})),
-    path("post/public/<int:pk>/", PublicPostViewSet.as_view({"get": "detail"})),
+    path("post/public/<int:pk>/", PublicPostViewSet.as_view({"get": "retrieve"})),
     path(
         "post/<int:pk>/",
         PostViewSet.as_view(

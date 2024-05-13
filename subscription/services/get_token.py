@@ -13,7 +13,7 @@ def get_api_token():
         username = EXTERNAL_API_USERNAME
         password = EXTERNAL_API_PASSWORD
 
-        params = {username: username, password: password}
+        params = {"username": username, "password": password}
 
         response = requests.get(url, params=params)
         response.raise_for_status()

@@ -4,7 +4,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 from .serializers import SubscriptionSerializer, SubscriptionDataSerializer
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from .models import Subscription, UserSubcription
+from .models import Subscription, UserSubcription, UserWalletAddress
 from .services.create_address import create_wallet_address
 
 # from rest_fremework.permissions import IsAuthenticated
@@ -13,24 +13,20 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.pagination import PageNumberPagination
 
-import qrcode
-import base64
-from io import BytesIO
-
 
 class CreatePaymentView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="API for getting payment QR code",
+        operation_summary="API for getting bitcoin addresses",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             required=["subscription_id"],
             properties={
                 "subscription_id": openapi.Schema(
                     type=openapi.TYPE_INTEGER,
-                    description="ID of the subscription for which to generate a QR code",
+                    description="ID of the subscription",
                 )
             },
         ),
@@ -45,24 +41,19 @@ class CreatePaymentView(APIView):
 
         try:
             subscription = Subscription.objects.get(id=subscription_id)
-            user = request.user
-            wallet_address = create_wallet_address(username=user.username)
-            data = f"ethereum:{wallet_address}"
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
-                border=4,
-            )
-            qr.add_data(data)
-            qr.make(fit=True)
-            img = qr.make_image(fill="black", back_color="white")
-            img_buffer = BytesIO()
-            img.save(img_buffer, format="PNG")
-            img_buffer.seek(0)  # Move the buffer cursor to the start
-
-            # Return the image directly as an HTTP response with image/png MIME type
-            return HttpResponse(img_buffer, content_type="image/png")
+            if subscription.package_type == "paid":
+                user = request.user
+                wallet_address = create_wallet_address(username=user.username)
+                UserWalletAddress.objects.create(
+                    user=user, wallet_address=wallet_address, subscription=subscription
+                )
+                return Response(
+                    {
+                        "wallet_address": wallet_address,
+                        "amount": subscription.price,
+                    },
+                    status=status.HTTP_200_OK,
+                )
         except Subscription.DoesNotExist:
             return Response(
                 {"error": "Subscription not found", "success": False},
@@ -86,17 +77,21 @@ class MySubscriptionListView(APIView):
     def get(self, request, *args, **kwargs):
         try:
             user = request.user
-            subscriptions = (
-                UserSubcription.objects.filter(user=user).order_by("-id").first()
-            )
-            serializer = SubscriptionDataSerializer(subscriptions.plan)
-            return Response(
-                data={
-                    "subcription": serializer.data,
-                    "start_date": subscriptions.start_date,
-                    "end_date": subscriptions.end_date,
-                },
-                status=status.HTTP_200_OK,
-            )
+            subscriptions = UserSubcription.objects.filter(user=user).order_by("-id")
+            if subscriptions.exists():
+                serializer = SubscriptionDataSerializer(subscriptions.first().plan)
+                return Response(
+                    data={
+                        "subcription": serializer.data,
+                        "start_date": subscriptions.start_date,
+                        "end_date": subscriptions.end_date,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"message": "No subscription found", "success": False},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

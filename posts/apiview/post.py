@@ -34,7 +34,6 @@ class PostViewSet(ModelViewSet):
 
 
 class PublicPostViewSet(ReadOnlyModelViewSet):
-    authentication_classes = [TokenAuthentication]
     serializer_class = PostSerializers
     queryset = Post.objects.filter(status=Post.Status.PUBLISHED)
     filterset_class = PostFilter

@@ -219,6 +219,11 @@ CRONJOBS = [
         "orders.cron.positions.updatePositions",
         ">> /tmp/updatePositions.log",
     ),
+    (
+        "0 * * * *",
+        "osubscription.cron.check_wallet_address.check_user_wallet_address",
+        ">> /tmp/check_user_wallet_address.log",
+    ),
 ]
 
 # Email Backend Configuration

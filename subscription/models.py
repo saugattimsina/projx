@@ -1,6 +1,7 @@
 from django.db import models
 from ckeditor.fields import RichTextField
 from user.models import User
+from datetime import datetime, timedelta
 
 
 # Create your models here.
@@ -29,6 +30,7 @@ class UserSubcription(models.Model):
     plan = models.ForeignKey(Subscription, on_delete=models.CASCADE)
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -36,6 +38,17 @@ class UserSubcription(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.plan}"
+
+    def save(self, *args, **kwargs):
+        if self.is_active:
+            active_subscriptions = UserSubcription.objects.filter(
+                user=self.user, is_active=True
+            )
+            if active_subscriptions.exists():
+                active_subscriptions.update(is_active=False)
+        if not self.end_date:
+            self.end_date = self.start_date + timedelta(days=30)
+        super().save(*args, **kwargs)
 
 
 class UserSubPaymentHistory(models.Model):
@@ -64,3 +77,23 @@ class UserSubPaymentHistory(models.Model):
     )
     payment_status = models.CharField(max_length=100, null=True, blank=True)
     has_partial_payment = models.BooleanField(default=False)
+
+
+class UserWalletAddress(models.Model):
+    user = models.ForeignKey(
+        User,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    wallet_address = models.CharField(max_length=250)
+    subscription = models.ForeignKey(
+        Subscription,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    is_completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.wallet_address}"
