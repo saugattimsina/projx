@@ -82,6 +82,7 @@ urlpatterns = [
     path("api/binary/", include("binarytreeapi.urls")),
     path("income/", include("signalbot.apiurls")),
     path("posts/", include("posts.urls")),
+    path("projx-wallet/", include("projxwallet.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

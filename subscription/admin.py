@@ -2,7 +2,6 @@ from django.contrib import admin
 
 from .models import (
     Subscription,
-    SubscriptionDetail,
     UserSubcription,
     UserSubPaymentHistory,
     UserWalletAddress,
@@ -10,7 +9,6 @@ from .models import (
 
 # Register your models here.
 admin.site.register(Subscription)
-admin.site.register(SubscriptionDetail)
 admin.site.register(UserSubPaymentHistory)
 admin.site.register(UserWalletAddress)
 

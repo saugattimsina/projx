@@ -18,7 +18,7 @@ from django.core.files.base import ContentFile
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password, check_password
-from subscription.models import UserSubcription
+from subscription.models import UserSubcription, UserSubPaymentHistory
 from binarytree.models import MLMRank, UserRank
 import ccxt
 from .utils import generate_otp, send_otp_email
@@ -153,16 +153,21 @@ class VerifyOTPSerializer(serializers.Serializer):
         user.save(update_fields=["login_otp_used"])
         key = UserKey.objects.filter(user=user).exists()
         subscription = UserSubcription.objects.filter(user=user)
+        sub = {}
         if subscription.exists():
-            subscription = subscription.last()
-            sub = {}
-            # sub["subscription_id"] = subscription.id
-            sub["subscription_type"] = subscription.plan.package_name
-            # sub["subscription_start_date"] = subscription.start_date
-            sub["package_type"] = subscription.plan.package_type
+            sub["subscribed"] = True
             sub["subscription_end_date"] = subscription.end_date
+            sub["partial_payment"] = False
         else:
-            sub = {}
+            sub_payment_history = UserSubPaymentHistory.objects.filter(
+                user=user
+            ).order_by("-date_transaction")
+            if sub_payment_history.exists():
+                sub["subscribed"] = False
+                sub["partial_payment"] = sub_payment_history.first().has_partial_payment
+            else:
+                sub["subscribed"] = False
+                sub["partial_payment"] = False
 
         rank = UserRank.objects.get(user=user)
         user_rank = rank.rank.rank_name
@@ -176,7 +181,7 @@ class VerifyOTPSerializer(serializers.Serializer):
                 "is_client": user.is_client,
                 "key": key,
                 "user_rank": user_rank,
-                "package": sub,
+                "subscription": sub,
             },
         }
 
