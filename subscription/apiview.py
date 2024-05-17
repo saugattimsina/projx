@@ -82,7 +82,7 @@ class MySubscriptionListView(APIView):
                 serializer = SubscriptionDataSerializer(subscriptions.first().plan)
                 return Response(
                     data={
-                        "subcription": serializer.data,
+                        "subscription": serializer.data,
                         "start_date": subscriptions.start_date,
                         "end_date": subscriptions.end_date,
                     },

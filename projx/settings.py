@@ -221,7 +221,7 @@ CRONJOBS = [
     ),
     (
         "0 * * * *",
-        "osubscription.cron.check_wallet_address.check_user_wallet_address",
+        "subscription.cron.check_wallet_address.check_user_wallet_address",
         ">> /tmp/check_user_wallet_address.log",
     ),
 ]

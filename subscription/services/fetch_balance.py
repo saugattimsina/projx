@@ -9,6 +9,7 @@ from .get_token import get_api_token
 import json
 from ..models import UserSubcription, UserSubPaymentHistory
 from .release_token import realease_token_in_address
+from django.utils import timezone
 
 
 def get_address_balance(address, user, subcription):
@@ -38,6 +39,7 @@ def get_address_balance(address, user, subcription):
                 amount=balance,
                 remaining_amount=remaining_amount,
                 has_partial_payment=has_partial_payment,
+                date_transaction=timezone.now(),
             )
             realease_token_in_address(userwalletaddress=address)
             return balance

@@ -5,12 +5,14 @@ from .models import (
     SubscriptionDetail,
     UserSubcription,
     UserSubPaymentHistory,
+    UserWalletAddress,
 )
 
 # Register your models here.
 admin.site.register(Subscription)
 admin.site.register(SubscriptionDetail)
 admin.site.register(UserSubPaymentHistory)
+admin.site.register(UserWalletAddress)
 
 
 @admin.register(UserSubcription)
